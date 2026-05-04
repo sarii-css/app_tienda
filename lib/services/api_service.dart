@@ -7,8 +7,11 @@ class ApiService {
 
   static Future<List<Producto>> obtenerProductos() async {
     final response = await http.get(
-      Uri.parse('$baseUrl/productos'),
+      Uri.parse('$baseUrl/productos/productos'),
     );
+
+    print("STATUS: ${response.statusCode}");
+print("BODY: ${response.body}");
 
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
