@@ -28,7 +28,7 @@ class Producto {
       color: json['color'],
       talla: json['talla'],
       imagen: json['imagen'],
-      categoria: json['categoria']['tipo'], // 👈 objeto dentro
+      categoria: json['categoria']['tipo'],
     );
   }
 }

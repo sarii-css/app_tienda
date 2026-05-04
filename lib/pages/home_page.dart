@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/producto.dart';
-import 'producto_page.dart';
+import 'producto_detalle_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Function(String) onCategoriaTap;
+
+  const HomePage({super.key, required this.onCategoriaTap});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -78,8 +80,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
-      bottomNavigationBar: _buildBottomBar(),
     );
   }
 
@@ -126,66 +126,60 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 🧩 CATEGORÍAS
- Widget _buildCategorias() {
-  final categorias = [
-    {"nombre": "Playera", "imagen": "playera.png"},
-    {"nombre": "Hoodie", "imagen": "sudadera.png"},
-    {"nombre": "Otro", "imagen": "otros.png"},
-  ];
+  Widget _buildCategorias() {
+    final categorias = [
+      {"nombre": "Playera", "imagen": "playera.png"},
+      {"nombre": "Hoodie", "imagen": "sudadera.png"},
+      {"nombre": "Otro", "imagen": "otros.png"},
+    ];
 
-  return SizedBox(
-    height: 110,
-    child: ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: categorias.length,
-      itemBuilder: (context, index) {
-        final cat = categorias[index];
+    return SizedBox(
+      height: 110,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: categorias.length,
+        itemBuilder: (context, index) {
+          final cat = categorias[index];
 
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ProductoPage(
-                  categoria: cat["nombre"]!,
-                ),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              children: [
-                Container(
-                  width: 75,
-                  height: 75,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[900],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      "http://10.0.2.2:8080/uploads/${cat["imagen"]}",
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.image, color: Colors.white),
+          return GestureDetector(
+            onTap: () {
+              // 🔥 AQUÍ YA NO NAVEGA, SOLO AVISA AL MAIN
+              widget.onCategoriaTap(cat["nombre"]!);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  Container(
+                    width: 75,
+                    height: 75,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.network(
+                        "http://10.0.2.2:8080/uploads/${cat["imagen"]}",
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.image, color: Colors.white),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  cat["nombre"]!,
-                  style: const TextStyle(color: Colors.white70),
-                )
-              ],
+                  const SizedBox(height: 6),
+                  Text(
+                    cat["nombre"]!,
+                    style: const TextStyle(color: Colors.white70),
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    ),
-  );
-}
+          );
+        },
+      ),
+    );
+  }
 
   /// 🔘 MINI MENÚ
   Widget _buildMiniMenu() {
@@ -213,9 +207,18 @@ class _HomePageState extends State<HomePage> {
         childAspectRatio: 0.68,
       ),
       itemBuilder: (context, index) {
-        final p = productos[index];
+      final p = productos[index];
 
-        return Padding(
+      return GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProductoDetallePage(producto: p),
+            ),
+          );
+        },
+        child: Padding(
           padding: const EdgeInsets.all(10),
           child: Container(
             decoration: BoxDecoration(
@@ -254,7 +257,7 @@ class _HomePageState extends State<HomePage> {
                           color: Color(0xFF6F84A7),
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          ),
+                        ),
                       )
                     ],
                   ),
@@ -262,45 +265,9 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-        );
-      },
-    );
-  }
-
-  /// 🔻 BOTTOM BAR
-  Widget _buildBottomBar() {
-    return Container(
-      height: 70,
-      margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _navIcon(Icons.home, true),
-          _navIcon(Icons.local_offer, false),
-          _navIcon(Icons.shopping_cart, false),
-          _navIcon(Icons.favorite, false),
-        ],
-      ),
-    );
-  }
-
-  Widget _navIcon(IconData icon, bool active) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: active
-          ? BoxDecoration(
-              color: Colors.grey[800],
-              shape: BoxShape.circle,
-            )
-          : null,
-      child: Icon(
-        icon,
-        color: active ? Colors.white : Colors.grey,
-      ),
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 }
