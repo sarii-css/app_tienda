@@ -23,8 +23,8 @@ class _ProductoPageState extends State<ProductoPage> {
   String filtroSeleccionado = "todos";
   bool loading = true;
 
-  final categorias = ["todos", "hoodies", "playeras", "accesorios"];
-  final filtros = ["todos", "nuevo", "oferta", "popular"];
+  final categorias = ["todos", "hoodie", "playera", "otro"];
+  final filtros = ["todos", "manga larga", "manga corta", "oversize"];
 
   @override
   void initState() {
