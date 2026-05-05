@@ -1,7 +1,10 @@
-import 'package:app_tienda/pages/home_page.dart';
-import 'package:app_tienda/pages/producto_page.dart';
-import 'package:app_tienda/widgets/custom_header.dart';
 import 'package:flutter/material.dart';
+
+import 'home_page.dart';
+import 'producto_page.dart';
+import 'cesta_page.dart';
+import 'favoritos_page.dart';
+import '../widgets/custom_header.dart';
 
 class MainPage extends StatefulWidget {
   final String? categoriaInicial;
@@ -15,7 +18,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int index = 0;
   String? categoriaSeleccionada;
-  String searchText = ""; // 🔥 NUEVO
+  String searchText = "";
 
   @override
   void initState() {
@@ -29,7 +32,9 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    /// 🔥 PÁGINAS PRINCIPALES
     final pages = [
+      /// HOME
       HomePage(
         onCategoriaTap: (cat) {
           setState(() {
@@ -39,16 +44,21 @@ class _MainPageState extends State<MainPage> {
         },
       ),
 
+      /// PRODUCTOS
       ProductoPage(
         key: ValueKey(
-            "${categoriaSeleccionada ?? widget.categoriaInicial}-$searchText"),
+          "${categoriaSeleccionada ?? widget.categoriaInicial}-$searchText",
+        ),
         categoriaInicial:
             categoriaSeleccionada ?? widget.categoriaInicial,
-        search: searchText, // 🔥 AQUÍ SE MANDA
+        search: searchText,
       ),
 
-      const Placeholder(),
-      const Placeholder(),
+      /// CESTA
+      const CestaPage(),
+
+      /// FAVORITOS
+      const FavoritosPage(),
     ];
 
     return Scaffold(
@@ -57,20 +67,23 @@ class _MainPageState extends State<MainPage> {
       body: SafeArea(
         child: Column(
           children: [
+            /// 🔝 HEADER GLOBAL
             CustomHeader(
               onSearch: (value) {
                 setState(() {
                   searchText = value;
-                  index = 1; // 🔥 te manda a productos
+                  index = 1; // 🔥 manda a productos
                 });
               },
             ),
 
+            /// 📄 CONTENIDO
             Expanded(child: pages[index]),
           ],
         ),
       ),
 
+      /// 🔻 NAVBAR
       bottomNavigationBar: Container(
         height: 70,
         margin: const EdgeInsets.all(12),
@@ -91,6 +104,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  /// 🔘 ICONOS NAV
   Widget _navIcon(IconData icon, int i) {
     final active = index == i;
 
@@ -100,7 +114,8 @@ class _MainPageState extends State<MainPage> {
           index = i;
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(10),
         decoration: active
             ? BoxDecoration(
