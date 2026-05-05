@@ -29,16 +29,20 @@ class _ProductoPageState extends State<ProductoPage> {
   @override
   void initState() {
     super.initState();
-    cargarProductos();
 
     if (widget.categoriaInicial != null) {
       categoriaSeleccionada = widget.categoriaInicial!;
     }
+
+    cargarProductos();
   }
 
+  // 🔥 FIX DEL ERROR AQUÍ
   Future<void> cargarProductos() async {
     try {
       final productos = await ApiService.obtenerProductos();
+
+      if (!mounted) return; // 👈 evita el error
 
       setState(() {
         data = productos;
@@ -46,6 +50,9 @@ class _ProductoPageState extends State<ProductoPage> {
       });
     } catch (e) {
       print(e);
+
+      if (!mounted) return; // 👈 también aquí
+
       setState(() => loading = false);
     }
   }
@@ -91,8 +98,8 @@ class _ProductoPageState extends State<ProductoPage> {
                 },
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
                     color: selected ? Colors.white : Colors.grey[900],
                     borderRadius: BorderRadius.circular(20),
@@ -134,7 +141,8 @@ class _ProductoPageState extends State<ProductoPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: selected ? Colors.grey[700] : Colors.grey[900],
+                    color:
+                        selected ? Colors.grey[700] : Colors.grey[900],
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(
@@ -192,24 +200,37 @@ class _ProductoPageState extends State<ProductoPage> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
                                 // 🖼️ IMAGEN
                                 Expanded(
                                   child: ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(20)),
+                                    borderRadius:
+                                        const BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
                                     child: Image.network(
                                       "http://10.0.2.2:8080/uploads/${producto.imagen}",
                                       width: double.infinity,
                                       fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Center(
+                                          child: Icon(
+                                            Icons.error,
+                                            color: Colors.red,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
 
                                 // 📝 INFO
                                 Padding(
-                                  padding: const EdgeInsets.all(10),
+                                  padding:
+                                      const EdgeInsets.all(10),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -218,7 +239,8 @@ class _ProductoPageState extends State<ProductoPage> {
                                         producto.nombre,
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight:
+                                              FontWeight.bold,
                                         ),
                                       ),
                                       const SizedBox(height: 5),
