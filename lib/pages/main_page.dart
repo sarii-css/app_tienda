@@ -1,5 +1,6 @@
 import 'package:app_tienda/pages/home_page.dart';
 import 'package:app_tienda/pages/producto_page.dart';
+import 'package:app_tienda/widgets/custom_header.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int index = 0;
   String? categoriaSeleccionada;
+  String searchText = ""; // 🔥 NUEVO
 
   @override
   void initState() {
@@ -27,9 +29,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    final categoriaActual =
-        categoriaSeleccionada ?? widget.categoriaInicial ?? "Playera";
-
     final pages = [
       HomePage(
         onCategoriaTap: (cat) {
@@ -41,10 +40,12 @@ class _MainPageState extends State<MainPage> {
       ),
 
       ProductoPage(
-  key: ValueKey(categoriaSeleccionada ?? widget.categoriaInicial),
-  categoriaInicial:
-      categoriaSeleccionada ?? widget.categoriaInicial,
-),
+        key: ValueKey(
+            "${categoriaSeleccionada ?? widget.categoriaInicial}-$searchText"),
+        categoriaInicial:
+            categoriaSeleccionada ?? widget.categoriaInicial,
+        search: searchText, // 🔥 AQUÍ SE MANDA
+      ),
 
       const Placeholder(),
       const Placeholder(),
@@ -52,7 +53,23 @@ class _MainPageState extends State<MainPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
-      body: pages[index],
+
+      body: SafeArea(
+        child: Column(
+          children: [
+            CustomHeader(
+              onSearch: (value) {
+                setState(() {
+                  searchText = value;
+                  index = 1; // 🔥 te manda a productos
+                });
+              },
+            ),
+
+            Expanded(child: pages[index]),
+          ],
+        ),
+      ),
 
       bottomNavigationBar: Container(
         height: 70,

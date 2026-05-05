@@ -5,280 +5,240 @@ import 'producto_detalle_page.dart';
 
 class ProductoPage extends StatefulWidget {
   final String? categoriaInicial;
+  final String search;
 
-  const ProductoPage({super.key, this.categoriaInicial});
+  const ProductoPage({
+    super.key,
+    this.categoriaInicial,
+    required this.search,
+  });
 
   @override
   State<ProductoPage> createState() => _ProductoPageState();
 }
 
 class _ProductoPageState extends State<ProductoPage> {
-  List<Producto> productos = [];
-  bool cargando = true;
-
+  List<Producto> data = [];
   String categoriaSeleccionada = "todos";
   String filtroSeleccionado = "todos";
+  bool loading = true;
 
-  final categorias = ["todos", "Playera", "Hoodie", "Otro"];
-  final filtros = ["todos", "manga larga", "manga corta", "oversize"];
+  final categorias = ["todos", "hoodies", "playeras", "accesorios"];
+  final filtros = ["todos", "nuevo", "oferta", "popular"];
 
   @override
   void initState() {
     super.initState();
+    cargarProductos();
 
     if (widget.categoriaInicial != null) {
       categoriaSeleccionada = widget.categoriaInicial!;
     }
-
-    cargarProductos();
   }
 
   Future<void> cargarProductos() async {
     try {
-      final data = await ApiService.obtenerProductos();
-
-      final filtrados = data.where((p) {
-        final matchCategoria = categoriaSeleccionada == "todos"
-            ? true
-            : p.categoria.toLowerCase() ==
-                categoriaSeleccionada.toLowerCase();
-
-        final matchFiltro = filtroSeleccionado == "todos"
-            ? true
-            : p.descripcion
-                .toLowerCase()
-                .contains(filtroSeleccionado);
-
-        return matchCategoria && matchFiltro;
-      }).toList();
+      final productos = await ApiService.obtenerProductos();
 
       setState(() {
-        productos = filtrados;
-        cargando = false;
+        data = productos;
+        loading = false;
       });
     } catch (e) {
-      print("ERROR: $e");
-      setState(() => cargando = false);
+      print(e);
+      setState(() => loading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+    final filtrados = data.where((p) {
+      final matchCategoria = categoriaSeleccionada == "todos"
+          ? true
+          : p.categoria.toLowerCase() ==
+              categoriaSeleccionada.toLowerCase();
 
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      final matchFiltro = filtroSeleccionado == "todos"
+          ? true
+          : p.descripcion.toLowerCase().contains(filtroSeleccionado);
 
-            const SizedBox(height: 10),
+      final matchSearch = widget.search.isEmpty
+          ? true
+          : p.nombre.toLowerCase().contains(widget.search.toLowerCase()) ||
+              p.descripcion.toLowerCase().contains(widget.search.toLowerCase());
 
-            // 🔥 CATEGORÍAS
-            _buildCategorias(),
+      return matchCategoria && matchFiltro && matchSearch;
+    }).toList();
 
-            const SizedBox(height: 10),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 🔥 CATEGORÍAS
+        SizedBox(
+          height: 50,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: categorias.length,
+            itemBuilder: (context, i) {
+              final cat = categorias[i];
+              final selected = cat == categoriaSeleccionada;
 
-            // 🔥 FILTROS
-            _buildFiltros(),
-
-            const SizedBox(height: 10),
-
-            // 🔥 GRID
-            Expanded(
-  child: cargando
-      ? const Center(child: CircularProgressIndicator())
-      : GridView.builder(
-          padding: const EdgeInsets.all(10),
-          itemCount: productos.length,
-          gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.68,
-          ),
-          itemBuilder: (context, index) {
-            final p = productos[index];
-
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProductoDetallePage(producto: p),
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    categoriaSeleccionada = cat;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: selected ? Colors.white : Colors.grey[900],
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                );
-              },
-              child: Container(
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.vertical(
-                                top: Radius.circular(20)),
-                        child: Image.network(
-                          "http://10.0.2.2:8080/uploads/${p.imagen}",
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
+                  child: Center(
+                    child: Text(
+                      cat.toUpperCase(),
+                      style: TextStyle(
+                        color: selected ? Colors.black : Colors.white,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        children: [
-                          Text(
-                            p.nombre,
-                            style: const TextStyle(
-                                color: Colors.white),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "\$${p.precio}",
-                            style: const TextStyle(
-                              color: Color(0xFF6F84A7),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // 🔥 FILTROS
+        SizedBox(
+          height: 40,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: filtros.length,
+            itemBuilder: (context, i) {
+              final fil = filtros[i];
+              final selected = fil == filtroSeleccionado;
+
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    filtroSeleccionado = fil;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected ? Colors.grey[700] : Colors.grey[900],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      fil,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // 🔥 LISTA
+        Expanded(
+          child: loading
+              ? const Center(child: CircularProgressIndicator())
+              : filtrados.isEmpty
+                  ? const Center(
+                      child: Text(
+                        "No hay productos 😢",
+                        style: TextStyle(color: Colors.white),
                       ),
                     )
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-)
-          ],
-        ),
-      ),
-    );
-  }
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(10),
+                      itemCount: filtrados.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.7,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemBuilder: (context, i) {
+                        final producto = filtrados[i];
 
-  /// 🔥 CATEGORÍAS
-  Widget _buildCategorias() {
-  final categoriasData = [
-    {"nombre": "todos", "imagen": "todos.png"},
-    {"nombre": "Playera", "imagen": "playera.png"},
-    {"nombre": "Hoodie", "imagen": "sudadera.png"},
-    {"nombre": "Otro", "imagen": "otros.png"},
-  ];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductoDetallePage(
+                                  producto: producto,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[900],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 🖼️ IMAGEN
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(20)),
+                                    child: Image.network(
+                                      "http://10.0.2.2:8080/uploads/${producto.imagen}",
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
 
-  return SizedBox(
-    height: 110,
-    child: ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: categoriasData.length,
-      itemBuilder: (context, index) {
-        final cat = categoriasData[index];
-        final nombre = cat["nombre"]!;
-        final seleccionada = categoriaSeleccionada == nombre;
-
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              categoriaSeleccionada = nombre;
-              cargando = true;
-            });
-            cargarProductos();
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              children: [
-                Container(
-                  width: 75,
-                  height: 75,
-                  decoration: BoxDecoration(
-                    color: seleccionada
-                        ? const Color(0xFF6F84A7)
-                        : Colors.grey[900],
-                    borderRadius: BorderRadius.circular(20),
-                    border: seleccionada
-                        ? Border.all(color: Colors.white, width: 2)
-                        : null,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      "http://10.0.2.2:8080/uploads/${cat["imagen"]}",
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.image, color: Colors.white),
+                                // 📝 INFO
+                                Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        producto.nombre,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        "\$${producto.precio}",
+                                        style: const TextStyle(
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  nombre,
-                  style: TextStyle(
-                    color: seleccionada
-                        ? Colors.white
-                        : Colors.white70,
-                    fontWeight: seleccionada
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    ),
-  );
-}
-
-  /// 🔥 FILTROS
-  Widget _buildFiltros() {
-    return SizedBox(
-      height: 40,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: filtros.length,
-        itemBuilder: (context, index) {
-          final f = filtros[index];
-          final seleccionado = filtroSeleccionado == f;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                filtroSeleccionado = f;
-                cargando = true;
-              });
-              cargarProductos();
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                color: seleccionado
-                    ? const Color(0xFF6F84A7)
-                    : Colors.grey[900],
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  f,
-                  style: TextStyle(
-                    color: seleccionado
-                        ? Colors.white
-                        : Colors.white70,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+        )
+      ],
     );
   }
 }

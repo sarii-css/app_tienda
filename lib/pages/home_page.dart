@@ -39,89 +39,45 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+    return Container(
+      color: const Color(0xFF0D0D0D),
 
-      body: cargando
+      child: cargando
           ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
 
-                    const Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      child: Text("Categorías",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
-                    ),
+                  const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    child: Text("Categorías",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                  ),
 
-                    _buildCategorias(),
+                  _buildCategorias(),
 
-                    _buildMiniMenu(),
+                  _buildMiniMenu(),
 
-                    const Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      child: Text("Nuestra selección para ti",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
-                    ),
+                  const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    child: Text("Nuestra selección para ti",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                  ),
 
-                    _buildProductos(),
-                  ],
-                ),
+                  _buildProductos(),
+                ],
               ),
             ),
-    );
-  }
-
-  /// 🔝 HEADER
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.white,
-            child: Icon(Icons.image, color: Colors.black),
-          ),
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Search",
-                hintStyle: const TextStyle(color: Colors.white54),
-                filled: true,
-                fillColor: Colors.grey[900],
-                prefixIcon:
-                    const Icon(Icons.search, color: Colors.white),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          const CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, color: Colors.white),
-          )
-        ],
-      ),
     );
   }
 
@@ -143,7 +99,6 @@ class _HomePageState extends State<HomePage> {
 
           return GestureDetector(
             onTap: () {
-              // 🔥 AQUÍ YA NO NAVEGA, SOLO AVISA AL MAIN
               widget.onCategoriaTap(cat["nombre"]!);
             },
             child: Padding(
@@ -207,67 +162,67 @@ class _HomePageState extends State<HomePage> {
         childAspectRatio: 0.68,
       ),
       itemBuilder: (context, index) {
-      final p = productos[index];
+        final p = productos[index];
 
-      return GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ProductoDetallePage(producto: p),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[900],
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(20)),
-                    child: Image.network(
-                      "http://10.0.2.2:8080/uploads/${p.imagen}",
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.image, color: Colors.white),
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductoDetallePage(producto: p),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[900],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20)),
+                      child: Image.network(
+                        "http://10.0.2.2:8080/uploads/${p.imagen}",
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.image, color: Colors.white),
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    children: [
-                      Text(
-                        p.nombre,
-                        style: const TextStyle(color: Colors.white),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "\$${p.precio}",
-                        style: const TextStyle(
-                          color: Color(0xFF6F84A7),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        Text(
+                          p.nombre,
+                          style: const TextStyle(color: Colors.white),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      )
-                    ],
-                  ),
-                )
-              ],
+                        const SizedBox(height: 4),
+                        Text(
+                          "\$${p.precio}",
+                          style: const TextStyle(
+                            color: Color(0xFF6F84A7),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }
