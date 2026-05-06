@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/producto.dart';
 import '../services/api_service.dart';
 import '../models/review.dart';
+import '../services/favorito_service.dart';
+import '../services/cesta_service.dart';
 
 class ProductoDetallePage extends StatefulWidget {
   final Producto producto;
@@ -15,9 +17,15 @@ class ProductoDetallePage extends StatefulWidget {
 
 class _ProductoDetallePageState
     extends State<ProductoDetallePage> {
+
   List<Review> reviews = [];
   int indiceReview = 0;
   double ratingPromedio = 0;
+
+  bool esFavorito = false;
+
+  /// 👇 USA EL MISMO USUARIO EN TODA LA APP
+  final int usuarioId = 8;
 
   @override
   void initState() {
@@ -73,7 +81,7 @@ class _ProductoDetallePageState
           child: Column(
             children: [
 
-              /// 🖼️ IMAGEN
+              /// 🖼️ IMAGEN + ICONOS
               Stack(
                 children: [
                   Image.network(
@@ -82,6 +90,8 @@ class _ProductoDetallePageState
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
+
+                  /// 🔙 BACK
                   Positioned(
                     top: 10,
                     left: 10,
@@ -90,9 +100,103 @@ class _ProductoDetallePageState
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back,
                             color: Colors.white),
-                        onPressed: () =>
-                            Navigator.pop(context),
+                        onPressed: () => Navigator.pop(context),
                       ),
+                    ),
+                  ),
+
+                  /// ❤️ 🛒 ICONOS
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Row(
+                      children: [
+
+                        /// FAVORITO
+                        CircleAvatar(
+                          backgroundColor: Colors.black54,
+                          child: IconButton(
+                            icon: Icon(
+                              esFavorito
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: esFavorito
+                                  ? Colors.red
+                                  : Colors.white,
+                            ),
+                            onPressed: () async {
+                              try {
+                                if (esFavorito) {
+                                  await FavoritoService
+                                      .eliminarFavorito(
+                                          usuarioId, producto.id);
+                                } else {
+                                  await FavoritoService
+                                      .guardarFavorito(
+                                          usuarioId, producto.id);
+                                }
+
+                                if (!mounted) return;
+
+                                setState(() {
+                                  esFavorito = !esFavorito;
+                                });
+
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(
+                                  SnackBar(
+                                    content: Text(esFavorito
+                                        ? "Agregado a favoritos"
+                                        : "Eliminado de favoritos"),
+                                  ),
+                                );
+                              } catch (e) {
+                                print(e);
+                              }
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        /// 🛒 CESTA
+                        CircleAvatar(
+                          backgroundColor: Colors.black54,
+                          child: IconButton(
+                            icon: const Icon(Icons.shopping_cart,
+                                color: Colors.white),
+                            onPressed: () async {
+                              try {
+                                await CestaService.guardarCesta(
+                                    usuarioId, producto.id);
+
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(
+                                  const SnackBar(
+                                    content:
+                                        Text("Agregado a la cesta"),
+                                  ),
+                                );
+
+                              } catch (e) {
+                                print("ERROR CESTA: $e");
+
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(
+                                  const SnackBar(
+                                    content:
+                                        Text("Error al agregar"),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -138,7 +242,6 @@ class _ProductoDetallePageState
 
                     const SizedBox(height: 25),
 
-                    /// ⭐ RATING
                     const Text(
                       "Rating & reviews",
                       style: TextStyle(
@@ -152,8 +255,7 @@ class _ProductoDetallePageState
                     Row(
                       children: [
                         Text(
-                          ratingPromedio
-                              .toStringAsFixed(1),
+                          ratingPromedio.toStringAsFixed(1),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 22,
@@ -184,7 +286,6 @@ class _ProductoDetallePageState
 
                     const SizedBox(height: 15),
 
-                    /// 💬 REVIEW
                     if (reviews.isNotEmpty)
                       Container(
                         padding:
