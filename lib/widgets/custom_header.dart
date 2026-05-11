@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_tienda/pages/perfil_pages.dart';
 
 class CustomHeader extends StatelessWidget {
   final Function(String) onSearch;
@@ -11,16 +12,19 @@ class CustomHeader extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
+          /// LOGO / IMAGEN
           const CircleAvatar(
             radius: 18,
             backgroundColor: Colors.white,
             child: Icon(Icons.image, color: Colors.black),
           ),
+
           const SizedBox(width: 10),
 
+          /// BUSCADOR
           Expanded(
             child: TextField(
-              onChanged: onSearch, // 🔥 AQUÍ VIVE EL SEARCH
+              onChanged: onSearch,
               decoration: InputDecoration(
                 hintText: "Search",
                 hintStyle: const TextStyle(color: Colors.white54),
@@ -38,10 +42,21 @@ class CustomHeader extends StatelessWidget {
 
           const SizedBox(width: 10),
 
-          const CircleAvatar(
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, color: Colors.white),
-          )
+          /// PERFIL
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PerfilPage(),
+                ),
+              );
+            },
+            child: const CircleAvatar(
+              backgroundColor: Colors.grey,
+              child: Icon(Icons.person, color: Colors.white),
+            ),
+          ),
         ],
       ),
     );

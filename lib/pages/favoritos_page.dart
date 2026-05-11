@@ -181,7 +181,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                                 color: Colors.blueGrey,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Text("Agregar",
+                              child: const Text("Agregar a cesta",
                                   style: TextStyle(color: Colors.white)),
                             ),
                           )
