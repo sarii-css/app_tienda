@@ -27,7 +27,7 @@ class Cliente {
   factory Cliente.fromJson(Map<String, dynamic> json) {
     return Cliente(
 
-      idPk: json['idPk'] ?? 0,
+      idPk: json['idPK'] ?? 0,
 
       nombre: json['nombre'] ?? '',
 
@@ -61,7 +61,7 @@ class Cliente {
   Map<String, dynamic> toJson() {
     return {
 
-      "idPk": idPk,
+      "idPK": idPk,
 
       "nombre": nombre,
 

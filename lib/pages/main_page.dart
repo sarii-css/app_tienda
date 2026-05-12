@@ -4,6 +4,7 @@ import 'home_page.dart';
 import 'producto_page.dart';
 import 'cesta_page.dart';
 import 'favoritos_page.dart';
+import 'perfil_pages.dart'; // 👈 IMPORTANTE
 import '../widgets/custom_header.dart';
 
 class MainPage extends StatefulWidget {
@@ -32,9 +33,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    /// 🔥 PÁGINAS PRINCIPALES
     final pages = [
-      /// HOME
       HomePage(
         onCategoriaTap: (cat) {
           setState(() {
@@ -44,7 +43,6 @@ class _MainPageState extends State<MainPage> {
         },
       ),
 
-      /// PRODUCTOS
       ProductoPage(
         key: ValueKey(
           "${categoriaSeleccionada ?? widget.categoriaInicial}-$searchText",
@@ -54,11 +52,9 @@ class _MainPageState extends State<MainPage> {
         search: searchText,
       ),
 
-      /// CESTA
       const CestaPage(),
-
-      /// FAVORITOS
       const FavoritosPage(),
+      const PerfilPage(), // 🔥 PERFIL COMO TAB
     ];
 
     return Scaffold(
@@ -67,17 +63,20 @@ class _MainPageState extends State<MainPage> {
       body: SafeArea(
         child: Column(
           children: [
-            /// 🔝 HEADER GLOBAL
             CustomHeader(
               onSearch: (value) {
                 setState(() {
                   searchText = value;
-                  index = 1; // 🔥 manda a productos
+                  index = 1;
+                });
+              },
+              onProfileTap: () {
+                setState(() {
+                  index = 4; // 🔥 IR A PERFIL
                 });
               },
             ),
 
-            /// 📄 CONTENIDO
             Expanded(child: pages[index]),
           ],
         ),
@@ -98,13 +97,13 @@ class _MainPageState extends State<MainPage> {
             _navIcon(Icons.local_offer, 1),
             _navIcon(Icons.shopping_cart, 2),
             _navIcon(Icons.favorite, 3),
+            _navIcon(Icons.person, 4), // 👈 PERFIL
           ],
         ),
       ),
     );
   }
 
-  /// 🔘 ICONOS NAV
   Widget _navIcon(IconData icon, int i) {
     final active = index == i;
 

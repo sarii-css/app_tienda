@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:app_tienda/pages/perfil_pages.dart';
 
 class CustomHeader extends StatelessWidget {
   final Function(String) onSearch;
+  final VoidCallback onProfileTap; 
 
-  const CustomHeader({super.key, required this.onSearch});
+  const CustomHeader({
+    super.key,
+    required this.onSearch,
+    required this.onProfileTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +16,6 @@ class CustomHeader extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
-          /// LOGO / IMAGEN
           const CircleAvatar(
             radius: 18,
             backgroundColor: Colors.white,
@@ -21,7 +24,6 @@ class CustomHeader extends StatelessWidget {
 
           const SizedBox(width: 10),
 
-          /// BUSCADOR
           Expanded(
             child: TextField(
               onChanged: onSearch,
@@ -42,16 +44,8 @@ class CustomHeader extends StatelessWidget {
 
           const SizedBox(width: 10),
 
-          /// PERFIL
           GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const PerfilPage(),
-                ),
-              );
-            },
+            onTap: onProfileTap, 
             child: const CircleAvatar(
               backgroundColor: Colors.grey,
               child: Icon(Icons.person, color: Colors.white),
