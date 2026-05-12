@@ -54,54 +54,64 @@ class _MainPageState extends State<MainPage> {
 
       const CestaPage(),
       const FavoritosPage(),
+      const PerfilPage(), // 👈 PERFIL REGRESA COMO TAB
     ];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+    return WillPopScope(
+      onWillPop: () async {
+        if (index == 4) {
+          setState(() {
+            index = 0; // 🔥 regresar a home
+          });
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0D0D0D),
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            CustomHeader(
-              onSearch: (value) {
-                setState(() {
-                  searchText = value;
-                  index = 1;
-                });
-              },
+        body: SafeArea(
+          child: Column(
+            children: [
 
-              // 🔥 AHORA ABRE COMO PANTALLA NUEVA
-              onProfileTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const PerfilPage(),
-                  ),
-                );
-              },
-            ),
+              /// 🔥 HEADER SOLO SI NO ES PERFIL
+              if (index != 4)
+                CustomHeader(
+                  onSearch: (value) {
+                    setState(() {
+                      searchText = value;
+                      index = 1;
+                    });
+                  },
+                  onProfileTap: () {
+                    setState(() {
+                      index = 4; // 👈 IR A PERFIL
+                    });
+                  },
+                ),
 
-            Expanded(child: pages[index]),
-          ],
+              Expanded(child: pages[index]),
+            ],
+          ),
         ),
-      ),
 
-      /// 🔻 NAVBAR (SIN PERFIL)
-      bottomNavigationBar: Container(
-        height: 70,
-        margin: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _navIcon(Icons.home, 0),
-            _navIcon(Icons.local_offer, 1),
-            _navIcon(Icons.shopping_cart, 2),
-            _navIcon(Icons.favorite, 3),
-          ],
+        /// 🔻 NAVBAR (SIN PERFIL)
+        bottomNavigationBar: Container(
+          height: 70,
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _navIcon(Icons.home, 0),
+              _navIcon(Icons.local_offer, 1),
+              _navIcon(Icons.shopping_cart, 2),
+              _navIcon(Icons.favorite, 3),
+            ],
+          ),
         ),
       ),
     );
