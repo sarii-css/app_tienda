@@ -4,7 +4,7 @@ import 'home_page.dart';
 import 'producto_page.dart';
 import 'cesta_page.dart';
 import 'favoritos_page.dart';
-import 'perfil_pages.dart'; // 👈 IMPORTANTE
+import 'perfil_pages.dart';
 import '../widgets/custom_header.dart';
 
 class MainPage extends StatefulWidget {
@@ -54,7 +54,6 @@ class _MainPageState extends State<MainPage> {
 
       const CestaPage(),
       const FavoritosPage(),
-      const PerfilPage(), // 🔥 PERFIL COMO TAB
     ];
 
     return Scaffold(
@@ -70,10 +69,15 @@ class _MainPageState extends State<MainPage> {
                   index = 1;
                 });
               },
+
+              // 🔥 AHORA ABRE COMO PANTALLA NUEVA
               onProfileTap: () {
-                setState(() {
-                  index = 4; // 🔥 IR A PERFIL
-                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PerfilPage(),
+                  ),
+                );
               },
             ),
 
@@ -82,7 +86,7 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
 
-      /// 🔻 NAVBAR
+      /// 🔻 NAVBAR (SIN PERFIL)
       bottomNavigationBar: Container(
         height: 70,
         margin: const EdgeInsets.all(12),
@@ -97,7 +101,6 @@ class _MainPageState extends State<MainPage> {
             _navIcon(Icons.local_offer, 1),
             _navIcon(Icons.shopping_cart, 2),
             _navIcon(Icons.favorite, 3),
-            _navIcon(Icons.person, 4), // 👈 PERFIL
           ],
         ),
       ),
