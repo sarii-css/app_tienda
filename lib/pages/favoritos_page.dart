@@ -15,7 +15,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
   List<Favorito> favoritos = [];
   bool cargando = true;
 
-  final int usuarioId = 8; // ✅ mismo usuario
+  final int usuarioId = 8;
 
   @override
   void initState() {
