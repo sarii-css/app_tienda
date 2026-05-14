@@ -4,6 +4,8 @@ import '../services/api_service.dart';
 import '../models/cesta.dart';
 import '../models/producto.dart';
 import 'producto_detalle_page.dart';
+import '../services/session.dart';
+import '../widgets/guest_view.dart';
 
 class CestaPage extends StatefulWidget {
   const CestaPage({super.key});
@@ -17,35 +19,50 @@ class _CestaPageState extends State<CestaPage> {
   List<Producto> sugerencias = [];
 
   bool cargando = true;
-  final int usuarioId = 8;
+
+  int get usuarioId => Session.userId!;
 
   @override
   void initState() {
     super.initState();
-    cargarTodo();
+
+    if (!Session.isGuest && Session.userId != null) {
+      cargarTodo();
+    } else {
+      cargando = false;
+    }
   }
 
   Future<void> cargarTodo() async {
-  try {
-    final data =
-        await CestaService.obtenerCestaPorUsuario(usuarioId);
-    final prod = await ApiService.obtenerProductos();
+    try {
+      final data =
+          await CestaService.obtenerCestaPorUsuario(usuarioId);
+      final prod = await ApiService.obtenerProductos();
 
-    setState(() {
-      cesta = data;
-      sugerencias = prod;
-      cargando = false;
-    });
-  } catch (e) {
-    print("ERROR: $e");
-    setState(() => cargando = false);
+      setState(() {
+        cesta = data;
+        sugerencias = prod;
+        cargando = false;
+      });
+    } catch (e) {
+      print("ERROR: $e");
+      setState(() => cargando = false);
+    }
   }
-}
+
   double get total =>
       cesta.fold(0, (sum, item) => sum + item.producto.precio);
 
   @override
   Widget build(BuildContext context) {
+    if (Session.isGuest || Session.userId == null) {
+      return const Scaffold(
+        body: GuestView(
+          mensaje: "Inicia sesión para ver tu cesta",
+        ),
+      );
+    }
+
     return Container(
       color: const Color(0xFF0D0D0D),
       child: Column(
@@ -79,7 +96,7 @@ class _CestaPageState extends State<CestaPage> {
                             ),
                           )
                         else
-                          ...cesta.map((item) => _cardCesta(item)).toList(),
+                          ...cesta.map((item) => _cardCesta(item)),
 
                         const SizedBox(height: 20),
 
@@ -95,7 +112,6 @@ class _CestaPageState extends State<CestaPage> {
     );
   }
 
-  /// CARD CESTA
   Widget _cardCesta(Cesta item) {
     final p = item.producto;
 
@@ -125,7 +141,7 @@ class _CestaPageState extends State<CestaPage> {
                   width: 70,
                   height: 70,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
+                  errorBuilder: (_, _, _) =>
                       const Icon(Icons.image, color: Colors.white),
                 ),
               ),
@@ -189,7 +205,6 @@ class _CestaPageState extends State<CestaPage> {
     );
   }
 
-  /// SUGERENCIAS
   Widget _sugerencias() {
     return Padding(
       padding: const EdgeInsets.all(12),
@@ -284,7 +299,6 @@ class _CestaPageState extends State<CestaPage> {
     );
   }
 
-  /// TOTAL
   Widget _totalSection() {
     return Container(
       padding: const EdgeInsets.all(15),

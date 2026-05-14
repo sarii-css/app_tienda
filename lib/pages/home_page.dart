@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                       child: Image.network(
                         "http://192.168.0.6:8080/uploads/${cat["imagen"]}",
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
+                        errorBuilder: (_, _, _) =>
                             const Icon(Icons.image, color: Colors.white),
                       ),
                     ),
@@ -190,7 +190,7 @@ class _HomePageState extends State<HomePage> {
                         "http://192.168.0.6:8080/uploads/${p.imagen}",
                         fit: BoxFit.cover,
                         width: double.infinity,
-                        errorBuilder: (_, __, ___) =>
+                        errorBuilder: (_, _, _) =>
                             const Icon(Icons.image, color: Colors.white),
                       ),
                     ),

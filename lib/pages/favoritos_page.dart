@@ -3,6 +3,8 @@ import '../services/favorito_service.dart';
 import '../services/cesta_service.dart';
 import '../models/favorito.dart';
 import 'producto_detalle_page.dart';
+import '../services/session.dart';
+import '../widgets/guest_view.dart';
 
 class FavoritosPage extends StatefulWidget {
   const FavoritosPage({super.key});
@@ -15,12 +17,17 @@ class _FavoritosPageState extends State<FavoritosPage> {
   List<Favorito> favoritos = [];
   bool cargando = true;
 
-  final int usuarioId = 8;
+  int get usuarioId => Session.userId!;
 
   @override
   void initState() {
     super.initState();
-    cargarFavoritos();
+
+    if (!Session.isGuest && Session.userId != null) {
+      cargarFavoritos();
+    } else {
+      cargando = false;
+    }
   }
 
   Future<void> cargarFavoritos() async {
@@ -40,6 +47,14 @@ class _FavoritosPageState extends State<FavoritosPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (Session.isGuest || Session.userId == null) {
+      return const Scaffold(
+        body: GuestView(
+          mensaje: "Inicia sesión para ver tus favoritos",
+        ),
+      );
+    }
+
     return Container(
       color: const Color(0xFF0D0D0D),
       child: Column(
@@ -76,8 +91,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
 
   Widget _cardFavorito(Favorito fav) {
     final p = fav.producto;
-
-    bool cargandoCesta = false; // ✅ evita spam taps
+    bool cargandoCesta = false;
 
     return StatefulBuilder(
       builder: (context, setLocalState) {
@@ -100,8 +114,6 @@ class _FavoritosPageState extends State<FavoritosPage> {
               ),
               child: Row(
                 children: [
-
-                  /// IMAGEN
                   ClipRRect(
                     borderRadius: const BorderRadius.horizontal(
                         left: Radius.circular(20)),
@@ -118,16 +130,14 @@ class _FavoritosPageState extends State<FavoritosPage> {
                       padding: const EdgeInsets.all(10),
                       child: Column(
                         children: [
-
-                          /// NOMBRE + ELIMINAR
                           Row(
                             mainAxisAlignment:
                                 MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
                                 child: Text(p.nombre,
-                                    style:
-                                        const TextStyle(color: Colors.white),
+                                    style: const TextStyle(
+                                        color: Colors.white),
                                     overflow: TextOverflow.ellipsis),
                               ),
                               IconButton(
@@ -147,7 +157,6 @@ class _FavoritosPageState extends State<FavoritosPage> {
 
                           const Spacer(),
 
-                          /// AGREGAR A CESTA
                           GestureDetector(
                             onTap: cargandoCesta
                                 ? null

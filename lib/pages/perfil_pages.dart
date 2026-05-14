@@ -7,6 +7,7 @@ import '../models/cliente.dart';
 import '../services/usuario_service.dart';
 import '../services/api_service.dart';
 import '../services/cliente_service.dart';
+import '../services/session.dart';
 
 import 'producto_detalle_page.dart';
 
@@ -26,39 +27,47 @@ class _PerfilPageState extends State<PerfilPage> {
 
   List<Producto> productos = [];
 
-  @override
-  void initState() {
-    super.initState();
+ @override
+void initState() {
+  super.initState();
+
+  if (!Session.isGuest && Session.userId != null) {
     cargarUsuario();
     cargarCliente();
-    cargarProductos();
   }
+
+  cargarProductos();
+}
 
   Future<void> cargarUsuario() async {
-    try {
-      final data = await UsuarioService.obtenerUsuario(8);
+  try {
+    if (Session.userId == null) return;
 
-      setState(() {
-        usuario = data;
-      });
+    final data = await UsuarioService.obtenerUsuario(Session.userId!);
 
-    } catch (e) {
-      print("ERROR USUARIO: $e");
-    }
+    setState(() {
+      usuario = data;
+    });
+
+  } catch (e) {
+    print("ERROR USUARIO: $e");
   }
+}
 
-  Future<void> cargarCliente() async {
-    try {
-      final data = await ClienteService.obtenerClientePorUsuario(8);
+ Future<void> cargarCliente() async {
+  try {
+    if (Session.userId == null) return;
 
-      setState(() {
-        cliente = data;
-      });
+    final data = await ClienteService.obtenerClientePorUsuario(Session.userId!);
 
-    } catch (e) {
-      print("ERROR CLIENTE: $e");
-    }
+    setState(() {
+      cliente = data;
+    });
+
+  } catch (e) {
+    print("ERROR CLIENTE: $e");
   }
+}
 
   Future<void> cargarProductos() async {
     try {
@@ -78,51 +87,61 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
 
-    /// 🔥 LOADING CORRECTO
-    if (cargando || cliente == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF0D0D0D),
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    /// 🔥 SCAFFOLD PRINCIPAL (CLAVE)
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
-
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-
-            _userInfo(),
-            _misDatos(),
-
-            const Divider(color: Colors.white24),
-
-            _misPedidos(),
-
-            const Divider(color: Colors.white24),
-
-            _acciones(),
-
-            const SizedBox(height: 20),
-
-            _sugerencias(),
-
-            const SizedBox(height: 10),
-
-            _productosSugeridos(),
-
-            const SizedBox(height: 100),
-          ],
+  if (Session.isGuest || Session.userId == null) {
+    return const Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: Center(
+        child: Text(
+          "Inicia sesión para ver tu perfil",
+          style: TextStyle(color: Colors.white),
         ),
       ),
     );
   }
+
+  if (cargando || cliente == null) {
+    return const Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  return Scaffold(
+    backgroundColor: const Color(0xFF0D0D0D),
+
+    body: SingleChildScrollView(
+      child: Column(
+        children: [
+
+          _userInfo(),
+          _misDatos(),
+
+          const Divider(color: Colors.white24),
+
+          _misPedidos(),
+
+          const Divider(color: Colors.white24),
+
+          _acciones(),
+
+          const SizedBox(height: 20),
+
+          _sugerencias(),
+
+          const SizedBox(height: 10),
+
+          _productosSugeridos(),
+
+          const SizedBox(height: 100),
+        ],
+      ),
+    ),
+  );
+}
 
   // 👤 INFO
   Widget _userInfo() {
@@ -236,10 +255,10 @@ class _PerfilPageState extends State<PerfilPage> {
             _itemDato(
               Icons.location_on,
               "Dirección",
-              "${cliente?.direccion?.calle ?? ""}, "
-              "${cliente?.direccion?.colonia ?? ""}, "
-              "${cliente?.direccion?.municipio ?? ""}, "
-              "${cliente?.direccion?.estado ?? ""}",
+              "${cliente?.direccion.calle ?? ""}, "
+              "${cliente?.direccion.colonia ?? ""}, "
+              "${cliente?.direccion.municipio ?? ""}, "
+              "${cliente?.direccion.estado ?? ""}",
             ),
           ],
         ),
@@ -442,7 +461,7 @@ class _PerfilPageState extends State<PerfilPage> {
                       width: double.infinity,
                       fit: BoxFit.cover,
 
-                      errorBuilder: (_, __, ___) {
+                      errorBuilder: (_, _, _) {
                         return Container(
                           height: 170,
                           color: Colors.black26,
