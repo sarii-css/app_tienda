@@ -118,7 +118,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                     borderRadius: const BorderRadius.horizontal(
                         left: Radius.circular(20)),
                     child: Image.network(
-                      "http://192.168.0.6:8080/uploads/${p.imagen}",
+                      "http://192.168.0.10:8080/uploads/${p.imagen}",
                       width: 100,
                       height: double.infinity,
                       fit: BoxFit.cover,

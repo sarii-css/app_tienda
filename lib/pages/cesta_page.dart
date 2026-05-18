@@ -137,7 +137,7 @@ class _CestaPageState extends State<CestaPage> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
-                  "http://192.168.0.6:8080/uploads/${p.imagen}",
+                  "http://192.168.0.10:8080/uploads/${p.imagen}",
                   width: 70,
                   height: 70,
                   fit: BoxFit.cover,
@@ -256,7 +256,7 @@ class _CestaPageState extends State<CestaPage> {
                             borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(15)),
                             child: Image.network(
-                              "http://192.168.0.6:8080/uploads/${p.imagen}",
+                              "http://192.168.0.10:8080/uploads/${p.imagen}",
                               fit: BoxFit.cover,
                               width: double.infinity,
                             ),

@@ -456,7 +456,7 @@ Widget build(BuildContext context) {
                     ),
 
                     child: Image.network(
-                      "http://192.168.0.6:8080/uploads/${p.imagen}",
+                      "http://192.168.0.10:8080/uploads/${p.imagen}",
                       height: 170,
                       width: double.infinity,
                       fit: BoxFit.cover,

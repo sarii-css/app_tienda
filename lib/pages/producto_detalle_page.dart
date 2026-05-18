@@ -85,7 +85,7 @@ class _ProductoDetallePageState
               Stack(
                 children: [
                   Image.network(
-                    "http://192.168.0.6:8080/uploads/${producto.imagen}",
+                    "http://192.168.0.10:8080/uploads/${producto.imagen}",
                     height: 300,
                     width: double.infinity,
                     fit: BoxFit.cover,

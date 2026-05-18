@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: Image.network(
-                        "http://192.168.0.6:8080/uploads/${cat["imagen"]}",
+                        "http://192.168.0.10:8080/uploads/${cat["imagen"]}",
                         fit: BoxFit.cover,
                         errorBuilder: (_, _, _) =>
                             const Icon(Icons.image, color: Colors.white),
@@ -187,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(20)),
                       child: Image.network(
-                        "http://192.168.0.6:8080/uploads/${p.imagen}",
+                        "http://192.168.0.10:8080/uploads/${p.imagen}",
                         fit: BoxFit.cover,
                         width: double.infinity,
                         errorBuilder: (_, _, _) =>
