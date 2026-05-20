@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../pages/auth_page.dart'; // 👈 asegúrate de tener esto
+import '../pages/auth_page.dart'; 
 
 class GuestView extends StatelessWidget {
   final String mensaje;

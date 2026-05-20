@@ -11,6 +11,9 @@ import '../services/session.dart';
 
 import 'producto_detalle_page.dart';
 
+import '../storage/session_storage.dart';
+import '../widgets/guest_view.dart';
+
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
 
@@ -85,6 +88,23 @@ void initState() {
       });
     }
   }
+
+  Future<void> logout() async {
+  await SessionStorage.limpiarSesion();
+  Session.clear();
+
+  if (!mounted) return;
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const GuestView(
+        mensaje: "Inicia sesión para continuar",
+      ),
+    ),
+    (route) => false,
+  );
+}
 
   @override
 Widget build(BuildContext context) {
@@ -359,19 +379,31 @@ Widget build(BuildContext context) {
 
   // ⚙️ ACCIONES
   Widget _acciones() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+  return Padding(
+    padding: const EdgeInsets.all(16),
 
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _accion(Icons.autorenew),
-          _accion(Icons.support_agent),
-          _accion(Icons.verified_user),
-        ],
-      ),
-    );
-  }
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _accion(Icons.autorenew),
+        _accion(Icons.support_agent),
+        _accion(Icons.verified_user),
+
+        GestureDetector(
+          onTap: logout,
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.red[900],
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(Icons.logout, color: Colors.white),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _accion(IconData icono) {
     return Container(

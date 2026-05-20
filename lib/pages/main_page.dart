@@ -6,7 +6,36 @@ import 'cesta_page.dart';
 import 'favoritos_page.dart';
 import 'perfil_pages.dart';
 import '../widgets/custom_header.dart';
+import '../widgets/guest_view.dart';
+  
+import '../services/session.dart';
+import '../storage/session_storage.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SessionStorage.cargarSesion();
+
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Session.userId != null
+          ? const MainPage()
+          : const GuestView(
+              mensaje: "Inicia sesión para continuar",
+            ),
+    );
+  }
+}
+
+/// 🔥 TU MAIN PAGE (LA QUE YA TENÍAS)
 class MainPage extends StatefulWidget {
   final String? categoriaInicial;
 
@@ -42,7 +71,6 @@ class _MainPageState extends State<MainPage> {
           });
         },
       ),
-
       ProductoPage(
         key: ValueKey(
           "${categoriaSeleccionada ?? widget.categoriaInicial}-$searchText",
@@ -51,17 +79,16 @@ class _MainPageState extends State<MainPage> {
             categoriaSeleccionada ?? widget.categoriaInicial,
         search: searchText,
       ),
-
       const CestaPage(),
       const FavoritosPage(),
-      const PerfilPage(), // 👈 PERFIL REGRESA COMO TAB
+      const PerfilPage(),
     ];
 
     return WillPopScope(
       onWillPop: () async {
         if (index == 4) {
           setState(() {
-            index = 0; // 🔥 regresar a home
+            index = 0;
           });
           return false;
         }
@@ -73,8 +100,6 @@ class _MainPageState extends State<MainPage> {
         body: SafeArea(
           child: Column(
             children: [
-
-              /// 🔥 HEADER SOLO SI NO ES PERFIL
               if (index != 4)
                 CustomHeader(
                   onSearch: (value) {
@@ -85,17 +110,15 @@ class _MainPageState extends State<MainPage> {
                   },
                   onProfileTap: () {
                     setState(() {
-                      index = 4; // 👈 IR A PERFIL
+                      index = 4;
                     });
                   },
                 ),
-
               Expanded(child: pages[index]),
             ],
           ),
         ),
 
-        /// 🔻 NAVBAR (SIN PERFIL)
         bottomNavigationBar: Container(
           height: 70,
           margin: const EdgeInsets.all(12),
