@@ -5,7 +5,7 @@ import '../models/cliente.dart';
 
 class ClienteService {
 
-  static const String baseUrl = "http://192.168.0.6:8080/api";
+  static const String baseUrl = "http://192.168.0.10:8080/api";
 
   // 🔍 Obtener cliente por usuario
   static Future<Cliente> obtenerClientePorUsuario(int usuarioId) async {

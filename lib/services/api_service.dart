@@ -4,7 +4,7 @@ import '../models/producto.dart';
 import '../models/review.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.0.6:8080';
+  static const String baseUrl = 'http://192.168.0.10:8080';
 
   static Future<List<Producto>> obtenerProductos() async {
     final response = await http.get(

@@ -4,7 +4,7 @@ import '../models/favorito.dart';
 
 class FavoritoService {
   // 🔥 SOLO BASE
-  static const String baseUrl = "http://192.168.0.6:8080/api";
+  static const String baseUrl = "http://192.168.0.10:8080/api";
 
   /// 🔹 Obtener favoritos por usuario
   static Future<List<Favorito>> obtenerFavoritosPorUsuario(int usuarioId) async {

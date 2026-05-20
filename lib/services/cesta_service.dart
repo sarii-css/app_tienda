@@ -4,7 +4,7 @@ import '../models/cesta.dart';
 
 class CestaService {
   /// 🔥 OJO: SOLO la base (NO repitas rutas)
-  static const String baseUrl = "http://192.168.0.6:8080/api";
+  static const String baseUrl = "http://192.168.0.10:8080/api";
 
   /// 🔹 Obtener TODA la cesta
   static Future<List<Cesta>> obtenerCesta() async {

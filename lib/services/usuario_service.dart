@@ -6,7 +6,7 @@ class UsuarioService {
 
   // 🔥 URL BASE
   static const String baseUrl =
-      "http://192.168.0.6:8080/usuarios";
+      "http://192.168.0.8:8080/usuarios";
 
   // ==========================
   // 🔍 OBTENER USUARIO POR ID
@@ -127,7 +127,7 @@ class UsuarioService {
     String contrasena,
   ) async {
 
-    final url = Uri.parse(baseUrl);
+    final url = Uri.parse("$baseUrl/registrar");
 
     final response = await http.post(
 

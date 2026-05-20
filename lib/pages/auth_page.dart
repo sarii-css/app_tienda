@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'registro_page.dart';
 
 class AuthPage extends StatelessWidget {
   final VoidCallback onContinue;
@@ -31,7 +32,7 @@ class AuthPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const Placeholder(), 
+                    builder: (_) => const RegistroPage(), 
                   ),
                 );
               },
