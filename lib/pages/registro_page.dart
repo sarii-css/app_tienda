@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/usuario_service.dart';
+import '../services/session.dart';
+import 'main_page.dart';
 
 class RegistroPage extends StatefulWidget {
   const RegistroPage({super.key});
@@ -16,49 +18,63 @@ class _RegistroPageState extends State<RegistroPage> {
   bool cargando = false;
 
   Future<void> registrar() async {
-    if (nombreController.text.isEmpty ||
-        correoController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Completa todos los campos"),
-        ),
-      );
-      return;
-    }
 
-    try {
-      setState(() {
-        cargando = true;
-      });
+  if (nombreController.text.isEmpty ||
+      correoController.text.isEmpty ||
+      passwordController.text.isEmpty) {
 
-      await UsuarioService.crearUsuario(
-        nombreController.text.trim(),
-        correoController.text.trim(),
-        passwordController.text.trim(),
-      );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Completa todos los campos"),
+      ),
+    );
+    return;
+  }
 
-      if (!mounted) return;
+  try {
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Usuario registrado correctamente"),
-        ),
-      );
+    setState(() {
+      cargando = true;
+    });
 
-      Navigator.pop(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error: $e"),
-        ),
-      );
-    } finally {
+    final usuario =
+        await UsuarioService.crearUsuario(
+      nombreController.text.trim(),
+      correoController.text.trim(),
+      passwordController.text.trim(),
+    );
+
+    // 🔥 INICIAR SESIÓN AUTOMÁTICAMENTE
+    Session.isGuest = false;
+    Session.userId = usuario.idPK;
+
+    if (!mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const MainPage(),
+      ),
+      (route) => false,
+    );
+
+  } catch (e) {
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Error: $e"),
+      ),
+    );
+
+  } finally {
+
+    if (mounted) {
       setState(() {
         cargando = false;
       });
     }
   }
+}
 
   @override
   void dispose() {
@@ -105,7 +121,8 @@ class _RegistroPageState extends State<RegistroPage> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: "Usuario",
-                labelStyle: const TextStyle(color: Colors.white70),
+                labelStyle:
+                    const TextStyle(color: Colors.white70),
                 filled: true,
                 fillColor: Colors.grey[900],
                 border: OutlineInputBorder(
@@ -121,7 +138,8 @@ class _RegistroPageState extends State<RegistroPage> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: "Correo",
-                labelStyle: const TextStyle(color: Colors.white70),
+                labelStyle:
+                    const TextStyle(color: Colors.white70),
                 filled: true,
                 fillColor: Colors.grey[900],
                 border: OutlineInputBorder(
@@ -138,7 +156,8 @@ class _RegistroPageState extends State<RegistroPage> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: "Contraseña",
-                labelStyle: const TextStyle(color: Colors.white70),
+                labelStyle:
+                    const TextStyle(color: Colors.white70),
                 filled: true,
                 fillColor: Colors.grey[900],
                 border: OutlineInputBorder(
@@ -153,17 +172,21 @@ class _RegistroPageState extends State<RegistroPage> {
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: cargando ? null : registrar,
+                onPressed:
+                    cargando ? null : registrar,
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                 ),
+
                 child: cargando
                     ? const CircularProgressIndicator()
                     : const Text(
                         "Registrarse",
                         style: TextStyle(
                           color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                              FontWeight.bold,
                         ),
                       ),
               ),
