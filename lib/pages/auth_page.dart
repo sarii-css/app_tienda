@@ -1,9 +1,6 @@
-import 'package:app_tienda/pages/main_page.dart';
 import 'package:flutter/material.dart';
 import 'registro_page.dart';
-
 import 'login_page.dart';
-import '../main.dart'; // o donde tengas tu MainPage
 
 class AuthPage extends StatelessWidget {
   final VoidCallback onContinue;
@@ -36,7 +33,7 @@ class AuthPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const RegistroPage(), 
+                    builder: (_) => const RegistroPage(),
                   ),
                 );
               },
@@ -45,26 +42,18 @@ class AuthPage extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            /// 🔑 LOGIN
+            /// 🔥 LOGIN SIN CALLBACK
             OutlinedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => LoginPage(
-          onLoginSuccess: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const MainPage()),
-              (route) => false,
-            );
-          },
-        ),
-      ),
-    );
-  },
-  child: const Text("Log in"),
-),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginPage(),
+                  ),
+                );
+              },
+              child: const Text("Log in"),
+            ),
 
             const SizedBox(height: 10),
 

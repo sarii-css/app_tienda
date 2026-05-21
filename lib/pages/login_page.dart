@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import '../services/usuario_service.dart';
 import '../services/session.dart';
 import '../storage/session_storage.dart';
+import 'main_page.dart';
 
 class LoginPage extends StatefulWidget {
-  final VoidCallback onLoginSuccess;
-
-  const LoginPage({super.key, required this.onLoginSuccess});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -21,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> login() async {
 
-    // 🔥 VALIDACIÓN
     if (correoController.text.isEmpty ||
         passwordController.text.isEmpty) {
 
@@ -34,27 +32,30 @@ class _LoginPageState extends State<LoginPage> {
     try {
       setState(() => cargando = true);
 
+      print("ANTES DEL LOGIN");
+
       final usuario = await UsuarioService.login(
         correoController.text.trim(),
         passwordController.text.trim(),
       );
 
-      // 🔥 SESSION
+      print("DESPUÉS DEL LOGIN");
+
       Session.userId = usuario.idPK;
       Session.nombre = usuario.nombreusuario;
       Session.correo = usuario.correo;
       Session.isGuest = false;
 
-      // 🔥 GUARDAR SESIÓN
       await SessionStorage.guardarSesion();
 
-      // 🔥 CALLBACK
-      widget.onLoginSuccess();
+      /// 🔥 NAVEGACIÓN CORRECTA
+      if (!mounted) return;
 
-      // 🔥 REGRESAR
-      if (mounted) {
-        Navigator.pop(context);
-      }
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainPage()),
+        (route) => false,
+      );
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
