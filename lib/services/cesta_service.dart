@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/cesta.dart';
+import '../config.dart';
 
 class CestaService {
-  /// 🔥 OJO: SOLO la base (NO repitas rutas)
-  static const String baseUrl = "http://192.168.0.10:8080/api";
+  static String get baseUrl => "${Config.baseUrl}/api";
 
-  /// 🔹 Obtener TODA la cesta
   static Future<List<Cesta>> obtenerCesta() async {
     final response = await http.get(
       Uri.parse("$baseUrl/cesta"),
@@ -23,7 +22,6 @@ class CestaService {
     }
   }
 
-  /// 🔹 Obtener cesta por usuario
   static Future<List<Cesta>> obtenerCestaPorUsuario(int usuarioId) async {
     final response = await http.get(
       Uri.parse("$baseUrl/cesta/usuario/$usuarioId"),
@@ -40,7 +38,6 @@ class CestaService {
     }
   }
 
-  /// 🔹 Guardar en cesta (AGREGAR)
   static Future<void> guardarCesta(int usuarioId, int productoId) async {
     final response = await http.post(
       Uri.parse("$baseUrl/cesta"),
@@ -59,7 +56,6 @@ class CestaService {
     }
   }
 
-  /// 🔹 Eliminar de cesta
   static Future<void> eliminarCesta(int usuarioId, int productoId) async {
     final response = await http.put(
       Uri.parse("$baseUrl/cesta/eliminar/$usuarioId/$productoId"),

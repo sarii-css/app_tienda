@@ -7,7 +7,6 @@ class Cliente {
   final String telefono;
   final String genero;
 
-  // 🔥 FECHA COMO STRING
   final String fechaNacimiento;
 
   final Direccion direccion;
@@ -35,11 +34,9 @@ class Cliente {
 
       genero: json['genero'] ?? '',
 
-      // 🔥 EVITA ERROR SI VIENE NULL
       fechaNacimiento:
           json['fechaNacimiento']?.toString() ?? '',
 
-      // 🔥 DIRECCION
       direccion: json['direccion'] != null
           ? Direccion.fromJson(json['direccion'])
           : Direccion(

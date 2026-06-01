@@ -1,18 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/favorito.dart';
+import '../config.dart';
 
 class FavoritoService {
-  // 🔥 SOLO BASE
-  static const String baseUrl = "http://192.168.0.10:8080/api";
+  static String get baseUrl => "${Config.baseUrl}/api";
 
-  /// 🔹 Obtener favoritos por usuario
   static Future<List<Favorito>> obtenerFavoritosPorUsuario(int usuarioId) async {
     final response = await http.get(
       Uri.parse("$baseUrl/favoritos/usuario/$usuarioId"),
     );
 
-    // 🔥 AGREGA ESTO AQUÍ
     print("STATUS: ${response.statusCode}");
     print("BODY: ${response.body}");
 
@@ -24,7 +22,6 @@ class FavoritoService {
     }
   }
 
-  /// 🔹 Eliminar favorito
   static Future<void> eliminarFavorito(int usuarioId, int productoId) async {
     final response = await http.put(
       Uri.parse("$baseUrl/favoritos/eliminar/$usuarioId/$productoId"),
@@ -35,14 +32,13 @@ class FavoritoService {
     }
   }
 
-  /// 🔹 Guardar favorito
   static Future<void> guardarFavorito(int usuarioId, int productoId) async {
     final response = await http.post(
       Uri.parse("$baseUrl/favoritos"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
-        "usuario": {"idPK": usuarioId},   // 👈 IMPORTANTE
-        "producto": {"idPK": productoId}  // 👈 IMPORTANTE
+        "usuario": {"idPK": usuarioId},  
+        "producto": {"idPK": productoId}  
       }),
     );
 

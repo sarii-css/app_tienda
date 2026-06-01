@@ -1,23 +1,19 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/usuario.dart';
+import '../config.dart';
 
 class UsuarioService {
 
-  // 🔥 URL BASE
-  static const String baseUrl =
-      "http://192.168.0.8:8080/usuarios";
+static String get baseUrl =>
+  "${Config.baseUrl}/usuarios";
 
-  // ==========================
-  // 🔍 OBTENER USUARIO POR ID
-  // ==========================
   static Future<Usuario> obtenerUsuario(int id) async {
 
     final url = Uri.parse("$baseUrl/$id");
 
     final response = await http.get(url);
 
-    // 🔥 DEBUG
     print("================================");
     print("OBTENER USUARIO");
     print("URL: $url");
@@ -29,7 +25,6 @@ class UsuarioService {
 
       final data = jsonDecode(response.body);
 
-      // 🔥 VER JSON COMPLETO
       print("JSON DECODIFICADO:");
       print(data);
 
@@ -43,9 +38,6 @@ class UsuarioService {
     }
   }
 
-  // ==========================
-  // 📋 LISTAR USUARIOS
-  // ==========================
   static Future<List<Usuario>> obtenerUsuarios() async {
 
     final url = Uri.parse(baseUrl);
@@ -72,9 +64,6 @@ class UsuarioService {
     }
   }
 
-  // ==========================
-  // 🔐 LOGIN
-  // ==========================
   static Future<Usuario> login(
     String correo,
     String contrasena,
@@ -118,9 +107,6 @@ class UsuarioService {
     }
   }
 
-  // ==========================
-  // 📝 CREAR USUARIO
-  // ==========================
   static Future<Usuario> crearUsuario(
     String nombre,
     String correo,
@@ -168,9 +154,6 @@ class UsuarioService {
     }
   }
 
-  // ==========================
-  // ✏️ ACTUALIZAR NOMBRE
-  // ==========================
   static Future<Usuario> actualizarNombre(
     int id,
     String nuevoNombre,
@@ -212,9 +195,6 @@ class UsuarioService {
     }
   }
 
-  // ==========================
-  // ❌ ELIMINAR USUARIO
-  // ==========================
   static Future<bool> eliminarUsuario(int id) async {
 
     final url = Uri.parse("$baseUrl/$id");

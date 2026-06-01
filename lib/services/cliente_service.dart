@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/cliente.dart';
+import '../config.dart';
 
 class ClienteService {
 
-  static const String baseUrl = "http://192.168.0.10:8080/api";
+ static String get baseUrl => "${Config.baseUrl}/api";
 
-  // 🔍 Obtener cliente por usuario
   static Future<Cliente> obtenerClientePorUsuario(int usuarioId) async {
 
     final url = Uri.parse("$baseUrl/cliente/usuario/$usuarioId");

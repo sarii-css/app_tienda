@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/producto.dart';
 import '../models/review.dart';
+import '../config.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.0.10:8080';
+  static String get baseUrl =>
+  "${Config.baseUrl}";
 
   static Future<List<Producto>> obtenerProductos() async {
     final response = await http.get(
@@ -22,7 +24,6 @@ class ApiService {
     }
   }
 
-  /// ⭐ REVIEWS
   static Future<List<Review>> obtenerReviews(int productoId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/resenas/producto/$productoId'),
