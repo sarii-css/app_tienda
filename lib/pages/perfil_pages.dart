@@ -13,6 +13,7 @@ import 'producto_detalle_page.dart';
 
 import '../storage/session_storage.dart';
 import '../widgets/guest_view.dart';
+import 'editar_perfil_page.dart';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
@@ -226,9 +227,23 @@ Widget build(BuildContext context) {
             ),
 
             ElevatedButton(
-              onPressed: () {},
-              child: const Text("Editar"),
-            )
+  onPressed: () async {
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditarPerfilPage(
+          usuario: usuario!,
+          cliente: cliente!,
+        ),
+      ),
+    );
+
+    cargarUsuario();
+    cargarCliente();
+  },
+  child: const Text("Editar"),
+)
           ],
         ),
       ),

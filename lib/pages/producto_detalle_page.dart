@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import '../models/review.dart';
 import '../services/favorito_service.dart';
 import '../services/cesta_service.dart';
+import '../services/session.dart';
 
 class ProductoDetallePage extends StatefulWidget {
   final Producto producto;
@@ -25,7 +26,7 @@ class _ProductoDetallePageState
   bool esFavorito = false;
 
   /// 👇 USA EL MISMO USUARIO EN TODA LA APP
-  final int usuarioId = 8;
+  int get usuarioId => Session.userId!;
 
   @override
   void initState() {
@@ -61,13 +62,19 @@ class _ProductoDetallePageState
   }
 
   void cambiarReview() {
+    if (!mounted) return;
+
     if (reviews.isEmpty) return;
 
     setState(() {
       indiceReview = (indiceReview + 1) % reviews.length;
     });
 
-    Future.delayed(const Duration(seconds: 4), cambiarReview);
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        cambiarReview();
+      }
+    });
   }
 
   @override

@@ -195,6 +195,32 @@ static String get baseUrl =>
     }
   }
 
+  static Future<void> actualizarCorreo(
+    int id,
+    String correo,
+  ) async {
+
+    final url = Uri.parse(
+      "$baseUrl/$id/correo",
+    );
+
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "correo": correo,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        "Error al actualizar correo",
+      );
+    }
+  }
+
   static Future<bool> eliminarUsuario(int id) async {
 
     final url = Uri.parse("$baseUrl/$id");
@@ -209,4 +235,33 @@ static String get baseUrl =>
 
     return response.statusCode == 200;
   }
+
+  static Future<void> actualizarUsuario(
+    int id,
+    String nombre,
+    String correo,
+  ) async {
+
+    final url = Uri.parse("$baseUrl/$id");
+
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "nombreusuario": nombre,
+        "correo": correo,
+      }),
+    );
+
+    print("ACTUALIZAR USUARIO");
+    print(response.statusCode);
+    print(response.body);
+
+    if (response.statusCode != 200) {
+      throw Exception("Error al actualizar usuario");
+    }
+  }
+
 }
