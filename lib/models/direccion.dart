@@ -25,7 +25,7 @@ class Direccion {
 
   factory Direccion.fromJson(Map<String, dynamic> json) {
     return Direccion(
-      idPk: json['idPK'] ?? 0,
+      idPk: json['idPk'] ?? json['idPK'] ?? 0,
       numero: json['numero'] ?? '',
       calle: json['calle'] ?? '',
       colonia: json['colonia'] ?? '',
@@ -55,7 +55,7 @@ class Direccion {
 
   Map<String, dynamic> toJson() {
     return {
-      "idPK": idPk,
+      "idPk": idPk,
       "numero": numero,
       "calle": calle,
       "colonia": colonia,

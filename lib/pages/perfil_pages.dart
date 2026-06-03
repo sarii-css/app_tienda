@@ -1,3 +1,4 @@
+import 'package:app_tienda/models/direccion.dart';
 import 'package:flutter/material.dart';
 
 import '../models/usuario.dart';
@@ -7,13 +8,13 @@ import '../models/cliente.dart';
 import '../services/usuario_service.dart';
 import '../services/api_service.dart';
 import '../services/cliente_service.dart';
+import '../services/direccion_service.dart';
 import '../services/session.dart';
 
 import 'producto_detalle_page.dart';
 
 import '../storage/session_storage.dart';
 import '../widgets/guest_view.dart';
-import 'editar_perfil_page.dart';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
@@ -33,6 +34,14 @@ class _PerfilPageState extends State<PerfilPage> {
   final telefonoController = TextEditingController();
   final generoController = TextEditingController();
   final fechaController = TextEditingController();
+  final calleController = TextEditingController();
+  final numeroController = TextEditingController();
+  final coloniaController = TextEditingController();
+  final cpController = TextEditingController();
+  final ciudadController = TextEditingController();
+  final municipioController = TextEditingController();
+  final estadoController = TextEditingController();
+  final paisController = TextEditingController();
 
   bool cargando = true;
   List<Producto> productos = [];
@@ -75,19 +84,31 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   Future<void> cargarCliente() async {
-    try {
-      if (Session.userId == null) return;
+  try {
+    if (Session.userId == null) return;
 
-      final data = await ClienteService.obtenerClientePorUsuario(Session.userId!);
+    final data = await ClienteService
+        .obtenerClientePorUsuario(Session.userId!);
 
-      setState(() {
-        cliente = data;
-      });
+    final direccion = await DireccionService
+        .obtenerDireccionPorCliente(data.idPk);
 
-    } catch (e) {
-      print("ERROR CLIENTE: $e");
-    }
+    setState(() {
+      cliente = Cliente(
+        idPk: data.idPk,
+        nombre: data.nombre,
+        telefono: data.telefono,
+        genero: data.genero,
+        fechaNacimiento: data.fechaNacimiento,
+        direccion: direccion ?? Direccion.vacia(),
+        usuarioFK: data.usuarioFK,
+      );
+    });
+
+  } catch (e) {
+    print("ERROR CLIENTE: $e");
   }
+}
 
   Future<void> cargarProductos() async {
     try {
@@ -122,10 +143,18 @@ class _PerfilPageState extends State<PerfilPage> {
   void _mostrarPopupEdicion() {
     nombreController.text = cliente?.nombre ?? "";
     correoController.text = usuario?.correo ?? "";
-    passController.text = usuario?.contrasena ?? "";
+    passController.text = "";
     telefonoController.text = cliente?.telefono ?? "";
     generoController.text = cliente?.genero ?? "";
     fechaController.text = cliente?.fechaNacimiento ?? "";
+    calleController.text = cliente?.direccion.calle ?? "";
+    numeroController.text = cliente?.direccion.numero ?? "";
+    coloniaController.text = cliente?.direccion.colonia ?? "";
+    cpController.text = cliente?.direccion.cp ?? "";
+    ciudadController.text = cliente?.direccion.ciudad ?? "";
+    municipioController.text = cliente?.direccion.municipio ?? "";
+    estadoController.text = cliente?.direccion.estado ?? "";
+    paisController.text = cliente?.direccion.pais ?? "";
 
     showDialog(
       context: context,
@@ -138,12 +167,23 @@ class _PerfilPageState extends State<PerfilPage> {
                 TextField(controller: nombreController, decoration: const InputDecoration(labelText: "Nombre")),
                 TextField(controller: correoController, decoration: const InputDecoration(labelText: "Correo")),
                 TextField(controller: passController, decoration: const InputDecoration(labelText: "Contraseña")),
-                TextField(controller: telefonoController, decoration: const InputDecoration(labelText: "Teléfono")),
+                TextField(controller: telefonoController, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: "Teléfono"),),
                 TextField(controller: generoController, decoration: const InputDecoration(labelText: "Género")),
                 TextField(controller: fechaController, decoration: const InputDecoration(labelText: "Fecha (YYYY-MM-DD)")),
-              ],
+                const SizedBox(height: 15),
+                const Divider(),
+                const Text("Dirección", style: TextStyle(fontWeight: FontWeight.bold)),
+                TextField(controller: calleController, decoration: const InputDecoration(labelText: "Calle")),
+                TextField(controller: numeroController, decoration: const InputDecoration(labelText: "Número")),
+                TextField(controller: coloniaController, decoration: const InputDecoration(labelText: "Colonia")),
+                TextField(controller: cpController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "CP"),),
+                TextField(controller: ciudadController, decoration: const InputDecoration(labelText: "Ciudad")),
+                TextField(controller: municipioController, decoration: const InputDecoration(labelText: "Municipio")),
+                TextField(controller: estadoController, decoration: const InputDecoration(labelText: "Estado")),
+                TextField(controller: paisController, decoration: const InputDecoration(labelText: "País")),
+                ],
+              ),
             ),
-          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -163,13 +203,26 @@ Future<void> _guardarCambios() async {
   try {
     if (cliente == null || usuario == null) return;
 
+    final direccionActualizada = Direccion(
+      idPk: cliente!.direccion.idPk,
+      numero: numeroController.text,
+      calle: calleController.text,
+      colonia: coloniaController.text,
+      cp: cpController.text,
+      ciudad: ciudadController.text,
+      municipio: municipioController.text,
+      estado: estadoController.text,
+      pais: paisController.text,
+      idCliente: cliente!.idPk,
+    );
+
     final clienteActualizado = Cliente(
       idPk: cliente!.idPk,
       nombre: nombreController.text,
       telefono: telefonoController.text,
       genero: generoController.text,
       fechaNacimiento: fechaController.text,
-      direccion: cliente!.direccion,
+      direccion: direccionActualizada,
       usuarioFK: cliente!.usuarioFK,
     );
 
@@ -182,10 +235,14 @@ Future<void> _guardarCambios() async {
       cliente: clienteActualizado,
     );
 
-    await Future.wait([
-      ClienteService.actualizarCliente(clienteActualizado),
-      UsuarioService.actualizarUsuario(usuarioActualizado),
-    ]);
+    await ClienteService.actualizarCliente(clienteActualizado);
+    await UsuarioService.actualizarUsuario(usuarioActualizado);
+
+    if (cliente!.direccion.idPk == null) {
+      await DireccionService.crearDireccion(direccionActualizada);
+    } else {
+      await DireccionService.actualizarDireccion(direccionActualizada);
+    }
 
     await _initData();
 
