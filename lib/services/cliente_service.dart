@@ -13,6 +13,7 @@ class ClienteService {
     final url = Uri.parse("$baseUrl/cliente/usuario/$usuarioId");
 
     final response = await http.get(url);
+    print(response.body);
 
     if (response.statusCode == 200) {
 
@@ -26,7 +27,7 @@ class ClienteService {
 
     }
   }
-
+  
   static Future<void> actualizarCliente(Cliente c) async {
   final response = await http.put(
     Uri.parse("$baseUrl/cliente/${c.idPk}"),

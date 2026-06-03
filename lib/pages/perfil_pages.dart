@@ -13,6 +13,7 @@ import 'producto_detalle_page.dart';
 
 import '../storage/session_storage.dart';
 import '../widgets/guest_view.dart';
+import 'editar_perfil_page.dart';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
