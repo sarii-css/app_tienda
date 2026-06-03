@@ -7,7 +7,7 @@ class AuthService {
       String correo, String password) async {
 
     final response = await http.post(
-      Uri.parse('${Config.baseUrl}/login'),
+      Uri.parse('${Config.baseUrl}/usuarios/login'),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "correo": correo,
