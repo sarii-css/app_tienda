@@ -13,6 +13,7 @@ class ClienteService {
     final url = Uri.parse("$baseUrl/cliente/usuario/$usuarioId");
 
     final response = await http.get(url);
+    print(response.body);
 
     if (response.statusCode == 200) {
 
