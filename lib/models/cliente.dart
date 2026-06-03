@@ -6,11 +6,8 @@ class Cliente {
   final String nombre;
   final String telefono;
   final String genero;
-
   final String fechaNacimiento;
-
   final Direccion direccion;
-
   final int usuarioFK;
 
   Cliente({
@@ -25,51 +22,38 @@ class Cliente {
 
   factory Cliente.fromJson(Map<String, dynamic> json) {
     return Cliente(
-
-      idPk: json['idPK'] ?? 0,
-
+      idPk: json['idPk'] ?? json['idPK'] ?? 0,
       nombre: json['nombre'] ?? '',
-
       telefono: json['telefono'] ?? '',
-
       genero: json['genero'] ?? '',
-
-      fechaNacimiento:
-          json['fechaNacimiento']?.toString() ?? '',
-
+      fechaNacimiento: json['fechaNacimiento'] ?? '',
       direccion: json['direccion'] != null
           ? Direccion.fromJson(json['direccion'])
-          : Direccion(
-              idPK: 0,
-              numero: '',
-              calle: '',
-              colonia: '',
-              cp: '',
-              ciudad: '',
-              municipio: '',
-              estado: '',
-              pais: '',
-            ),
-
+          : Direccion.vacia(), 
       usuarioFK: json['usuarioFK'] ?? 0,
     );
   }
 
+  factory Cliente.vacio() {
+  return Cliente(
+    idPk: 0,
+    nombre: '',
+    telefono: '',
+    genero: '',
+    fechaNacimiento: '',
+    direccion: Direccion.vacia(),
+    usuarioFK: 0,
+  );
+}
+
   Map<String, dynamic> toJson() {
     return {
-
       "idPK": idPk,
-
       "nombre": nombre,
-
       "telefono": telefono,
-
       "genero": genero,
-
       "fechaNacimiento": fechaNacimiento,
-
       "direccion": direccion.toJson(),
-
       "usuarioFK": usuarioFK,
     };
   }

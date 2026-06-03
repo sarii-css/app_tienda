@@ -1,7 +1,5 @@
 class Direccion {
-
-  final int idPK;
-
+  final int idPk;
   final String numero;
   final String calle;
   final String colonia;
@@ -10,9 +8,10 @@ class Direccion {
   final String municipio;
   final String estado;
   final String pais;
+  final int idCliente;
 
   Direccion({
-    required this.idPK,
+    required this.idPk,
     required this.numero,
     required this.calle,
     required this.colonia,
@@ -21,12 +20,12 @@ class Direccion {
     required this.municipio,
     required this.estado,
     required this.pais,
+    required this.idCliente,
   });
 
   factory Direccion.fromJson(Map<String, dynamic> json) {
     return Direccion(
-      idPK: json['idPK'] ?? 0,
-
+      idPk: json['idPK'] ?? 0,
       numero: json['numero'] ?? '',
       calle: json['calle'] ?? '',
       colonia: json['colonia'] ?? '',
@@ -35,12 +34,28 @@ class Direccion {
       municipio: json['municipio'] ?? '',
       estado: json['estado'] ?? '',
       pais: json['pais'] ?? '',
+      idCliente: json['idCliente'] ?? 0,
+    );
+  }
+
+  factory Direccion.vacia() {
+    return Direccion(
+      idPk: 0,
+      numero: '',
+      calle: '',
+      colonia: '',
+      cp: '',
+      ciudad: '',
+      municipio: '',
+      estado: '',
+      pais: '',
+      idCliente: 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "idPK": idPK,
+      "idPK": idPk,
       "numero": numero,
       "calle": calle,
       "colonia": colonia,
@@ -49,6 +64,7 @@ class Direccion {
       "municipio": municipio,
       "estado": estado,
       "pais": pais,
+      "idCliente": idCliente,
     };
   }
 }

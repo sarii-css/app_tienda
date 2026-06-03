@@ -26,4 +26,19 @@ class ClienteService {
 
     }
   }
+
+  static Future<void> actualizarCliente(Cliente c) async {
+  final response = await http.put(
+    Uri.parse("$baseUrl/cliente/${c.idPk}"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(c.toJson()),
+  );
+
+  print("CLIENTE UPDATE STATUS: ${response.statusCode}");
+  print("BODY: ${response.body}");
+
+  if (response.statusCode != 200) {
+    throw Exception("Error al actualizar cliente");
+  }
+}
 }

@@ -23,54 +23,70 @@ class PerfilPage extends StatefulWidget {
 
 class _PerfilPageState extends State<PerfilPage> {
 
-  Usuario? usuario;
   Cliente? cliente;
+  Usuario? usuario;
+
+  final nombreController = TextEditingController();
+  final correoController = TextEditingController();
+  final passController = TextEditingController();
+  final telefonoController = TextEditingController();
+  final generoController = TextEditingController();
+  final fechaController = TextEditingController();
 
   bool cargando = true;
-
   List<Producto> productos = [];
 
- @override
-void initState() {
-  super.initState();
-
-  if (!Session.isGuest && Session.userId != null) {
-    cargarUsuario();
-    cargarCliente();
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+    cargarProductos();
   }
 
-  cargarProductos();
-}
+  Future<void> _initData() async {
+    setState(() {
+      cargando = true;
+    });
+
+    if (!Session.isGuest && Session.userId != null) {
+      await cargarUsuario();
+      await cargarCliente();
+    }
+
+    setState(() {
+      cargando = false;
+    });
+  }
 
   Future<void> cargarUsuario() async {
-  try {
-    if (Session.userId == null) return;
+    try {
+      if (Session.userId == null) return;
 
-    final data = await UsuarioService.obtenerUsuario(Session.userId!);
+      final data = await UsuarioService.obtenerUsuario(Session.userId!);
 
-    setState(() {
-      usuario = data;
-    });
+      setState(() {
+        usuario = data;
+      });
 
-  } catch (e) {
-    print("ERROR USUARIO: $e");
+    } catch (e) {
+      print("ERROR USUARIO: $e");
+    }
   }
-}
 
- Future<void> cargarCliente() async {
-  try {
-    if (Session.userId == null) return;
+  Future<void> cargarCliente() async {
+    try {
+      if (Session.userId == null) return;
 
-    final data = await ClienteService.obtenerClientePorUsuario(Session.userId!);
+      final data = await ClienteService.obtenerClientePorUsuario(Session.userId!);
 
-    setState(() {
-      cliente = data;
-    });
+      setState(() {
+        cliente = data;
+      });
 
-  } catch (e) {
-    print("ERROR CLIENTE: $e");
+    } catch (e) {
+      print("ERROR CLIENTE: $e");
+    }
   }
-}
 
   Future<void> cargarProductos() async {
     try {
@@ -78,92 +94,174 @@ void initState() {
 
       setState(() {
         productos = data;
-        cargando = false;
       });
 
     } catch (e) {
       print("ERROR PRODUCTOS: $e");
-      setState(() {
-        cargando = false;
-      });
     }
   }
 
   Future<void> logout() async {
-  await SessionStorage.limpiarSesion();
-  Session.clear();
+    await SessionStorage.limpiarSesion();
+    Session.clear();
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const GuestView(
-        mensaje: "Inicia sesión para continuar",
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const GuestView(
+          mensaje: "Inicia sesión para continuar",
+        ),
       ),
-    ),
-    (route) => false,
-  );
+      (route) => false,
+    );
+  }
+
+  void _mostrarPopupEdicion() {
+    nombreController.text = cliente?.nombre ?? "";
+    correoController.text = usuario?.correo ?? "";
+    passController.text = usuario?.contrasena ?? "";
+    telefonoController.text = cliente?.telefono ?? "";
+    generoController.text = cliente?.genero ?? "";
+    fechaController.text = cliente?.fechaNacimiento ?? "";
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Editar perfil"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(controller: nombreController, decoration: const InputDecoration(labelText: "Nombre")),
+                TextField(controller: correoController, decoration: const InputDecoration(labelText: "Correo")),
+                TextField(controller: passController, decoration: const InputDecoration(labelText: "Contraseña")),
+                TextField(controller: telefonoController, decoration: const InputDecoration(labelText: "Teléfono")),
+                TextField(controller: generoController, decoration: const InputDecoration(labelText: "Género")),
+                TextField(controller: fechaController, decoration: const InputDecoration(labelText: "Fecha (YYYY-MM-DD)")),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: _guardarCambios,
+              child: const Text("Guardar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+Future<void> _guardarCambios() async {
+  try {
+    if (cliente == null || usuario == null) return;
+
+    final clienteActualizado = Cliente(
+      idPk: cliente!.idPk,
+      nombre: nombreController.text,
+      telefono: telefonoController.text,
+      genero: generoController.text,
+      fechaNacimiento: fechaController.text,
+      direccion: cliente!.direccion,
+      usuarioFK: cliente!.usuarioFK,
+    );
+
+    final usuarioActualizado = Usuario(
+      idPK: usuario!.idPK,
+      nombreusuario: nombreController.text,
+      correo: correoController.text,
+      contrasena: passController.text,
+      grupoFK: usuario!.grupoFK,
+      cliente: clienteActualizado,
+    );
+
+    await Future.wait([
+      ClienteService.actualizarCliente(clienteActualizado),
+      UsuarioService.actualizarUsuario(usuarioActualizado),
+    ]);
+
+    await _initData();
+
+    if (!mounted) return;
+
+    Navigator.pop(context);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Perfil actualizado correctamente")),
+    );
+
+  } catch (e) {
+    print("ERROR REAL: $e");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Error al actualizar perfil")),
+    );
+  }
 }
 
   @override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
 
-  if (Session.isGuest || Session.userId == null) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF0D0D0D),
-      body: Center(
-        child: Text(
-          "Inicia sesión para ver tu perfil",
-          style: TextStyle(color: Colors.white),
+    if (Session.isGuest || Session.userId == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0D0D0D),
+        body: Center(
+          child: Text(
+            "Inicia sesión para ver tu perfil",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    if (cargando || cliente == null || usuario == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0D0D0D),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0D0D0D),
+
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+
+            _userInfo(),
+            _misDatos(),
+
+            const Divider(color: Colors.white24),
+
+            _misPedidos(),
+
+            const Divider(color: Colors.white24),
+
+            _acciones(),
+
+            const SizedBox(height: 20),
+
+            _sugerencias(),
+
+            const SizedBox(height: 10),
+
+            _productosSugeridos(),
+
+            const SizedBox(height: 100),
+          ],
         ),
       ),
     );
   }
 
-  if (cargando || cliente == null) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF0D0D0D),
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
-
-  return Scaffold(
-    backgroundColor: const Color(0xFF0D0D0D),
-
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-
-          _userInfo(),
-          _misDatos(),
-
-          const Divider(color: Colors.white24),
-
-          _misPedidos(),
-
-          const Divider(color: Colors.white24),
-
-          _acciones(),
-
-          const SizedBox(height: 20),
-
-          _sugerencias(),
-
-          const SizedBox(height: 10),
-
-          _productosSugeridos(),
-
-          const SizedBox(height: 100),
-        ],
-      ),
-    ),
-  );
-}
-
-  // 👤 INFO
   Widget _userInfo() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -226,8 +324,10 @@ Widget build(BuildContext context) {
             ),
 
             ElevatedButton(
-              onPressed: () {},
-              child: const Text("Editar"),
+              onPressed: () {
+                _mostrarPopupEdicion();
+              },
+              child: const Text("Editar perfil"),
             )
           ],
         ),
@@ -235,7 +335,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  // 📄 DATOS
   Widget _misDatos() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -330,7 +429,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  // 📦 PEDIDOS
   Widget _misPedidos() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -341,7 +439,7 @@ Widget build(BuildContext context) {
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Mis pedidos",
+              "Sobre los pedidos",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -377,7 +475,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  // ⚙️ ACCIONES
   Widget _acciones() {
   return Padding(
     padding: const EdgeInsets.all(16),
@@ -416,7 +513,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  // ⭐ TITULO
   Widget _sugerencias() {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
@@ -434,7 +530,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  // 🛍 PRODUCTOS
   Widget _productosSugeridos() {
 
     if (productos.isEmpty) {

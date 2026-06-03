@@ -9,8 +9,7 @@ class Usuario {
   final String correo;
   final int grupoFK;
 
-  // 🔥 RELACIÓN
-  final Cliente cliente;
+  Cliente cliente;
 
   Usuario({
     required this.idPK,
@@ -21,45 +20,19 @@ class Usuario {
     required this.cliente,
   });
 
-  factory Usuario.fromJson(Map<String, dynamic> json) {
-    return Usuario(
+ factory Usuario.fromJson(Map<String, dynamic> json) {
+  return Usuario(
+    idPK: json['idPK'] ?? 0,
+    nombreusuario: json['nombreusuario'] ?? '',
+    contrasena: json['contrasena'] ?? '',
+    correo: json['correo'] ?? '',
+    grupoFK: json['grupoFK'] ?? 0,
 
-      idPK: json['idPK'] ?? 0,
-
-      nombreusuario: json['nombreusuario'] ?? '',
-
-      contrasena: json['contrasena'] ?? '',
-
-      correo: json['correo'] ?? '',
-
-      grupoFK: json['grupoFK'] ?? 0,
-
-      // 🔥 CLIENTE
-      cliente: json['cliente'] != null
-          ? Cliente.fromJson(json['cliente'])
-          : Cliente(
-              idPk: 0,
-              nombre: '',
-              telefono: '',
-              genero: '',
-              fechaNacimiento: '',
-
-              direccion: Direccion(
-                idPK: 0,
-                numero: '',
-                calle: '',
-                colonia: '',
-                cp: '',
-                ciudad: '',
-                municipio: '',
-                estado: '',
-                pais: '',
-              ),
-
-              usuarioFK: 0,
-            ),
-    );
-  }
+    cliente: json['cliente'] != null
+        ? Cliente.fromJson(json['cliente'])
+        : Cliente.vacio(), 
+  );
+}
 
   Map<String, dynamic> toJson() {
     return {
@@ -71,7 +44,7 @@ class Usuario {
       "contrasena": contrasena,
 
       "correo": correo,
-
+  
       "grupoFK": grupoFK,
 
       "cliente": cliente.toJson(),

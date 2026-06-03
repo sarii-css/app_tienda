@@ -209,4 +209,23 @@ static String get baseUrl =>
 
     return response.statusCode == 200;
   }
+  
+  static Future<void> actualizarUsuario(Usuario user) async {
+  final response = await http.put(
+    Uri.parse("$baseUrl/${user.idPK}"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "nombreusuario": user.nombreusuario,
+      "correo": user.correo,
+      "contrasena": user.contrasena,
+    }),
+  );
+
+  print("USUARIO UPDATE STATUS: ${response.statusCode}");
+  print("BODY: ${response.body}");
+
+  if (response.statusCode != 200) {
+    throw Exception("Error al actualizar usuario");
+  }
+}
 }
