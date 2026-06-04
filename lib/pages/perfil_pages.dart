@@ -267,14 +267,8 @@ Future<void> _guardarCambios() async {
   Widget build(BuildContext context) {
 
     if (Session.isGuest || Session.userId == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF0D0D0D),
-        body: Center(
-          child: Text(
-            "Inicia sesión para ver tu perfil",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
+      return const GuestView(
+        mensaje: "Inicia sesión para ver tu perfil",
       );
     }
 
