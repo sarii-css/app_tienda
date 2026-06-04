@@ -140,6 +140,45 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
+Future<void> guardarCambios() async {
+  if (usuario == null || cliente == null) return;
+
+  try {
+
+    await ClienteService.actualizarCliente(cliente!.idPk, { 
+      "nombre": nombreController.text,
+      "telefono": telefonoController.text,
+      "genero": generoController.text,
+      "fechaNacimiento": fechaController.text,
+      "direccion": {
+        "calle": calleController.text,
+        "numero": numeroController.text,
+        "colonia": coloniaController.text,
+        "cp": cpController.text,
+        "municipio": municipioController.text,
+        "estado": estadoController.text,
+        "pais": paisController.text,
+        "ciudad": ciudadController.text,
+      }
+    });
+
+    await UsuarioService.actualizarNombre(
+      usuario!.idPK, 
+      nombreController.text,
+);
+
+    print("Todo actualizado correctamente");
+
+    Navigator.pop(context);
+
+    await cargarUsuario();
+    await cargarCliente();
+
+  } catch (e) {
+    print("Error: $e");
+  }
+}
+
   void _mostrarPopupEdicion() {
     nombreController.text = cliente?.nombre ?? "";
     correoController.text = usuario?.correo ?? "";
@@ -190,7 +229,7 @@ class _PerfilPageState extends State<PerfilPage> {
               child: const Text("Cancelar"),
             ),
             ElevatedButton(
-              onPressed: _guardarCambios,
+              onPressed: guardarCambios,
               child: const Text("Guardar"),
             ),
           ],
@@ -198,70 +237,6 @@ class _PerfilPageState extends State<PerfilPage> {
       },
     );
   }
-
-Future<void> _guardarCambios() async {
-  try {
-    if (cliente == null || usuario == null) return;
-
-    final direccionActualizada = Direccion(
-      idPk: cliente!.direccion.idPk,
-      numero: numeroController.text,
-      calle: calleController.text,
-      colonia: coloniaController.text,
-      cp: cpController.text,
-      ciudad: ciudadController.text,
-      municipio: municipioController.text,
-      estado: estadoController.text,
-      pais: paisController.text,
-      idCliente: cliente!.idPk,
-    );
-
-    final clienteActualizado = Cliente(
-      idPk: cliente!.idPk,
-      nombre: nombreController.text,
-      telefono: telefonoController.text,
-      genero: generoController.text,
-      fechaNacimiento: fechaController.text,
-      direccion: direccionActualizada,
-      usuarioFK: cliente!.usuarioFK,
-    );
-
-    final usuarioActualizado = Usuario(
-      idPK: usuario!.idPK,
-      nombreusuario: nombreController.text,
-      correo: correoController.text,
-      contrasena: passController.text,
-      grupoFK: usuario!.grupoFK,
-      cliente: clienteActualizado,
-    );
-
-    await ClienteService.actualizarCliente(clienteActualizado);
-    await UsuarioService.actualizarUsuario(usuarioActualizado);
-
-    if (cliente!.direccion.idPk == null) {
-      await DireccionService.crearDireccion(direccionActualizada);
-    } else {
-      await DireccionService.actualizarDireccion(direccionActualizada);
-    }
-
-    await _initData();
-
-    if (!mounted) return;
-
-    Navigator.pop(context);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Perfil actualizado correctamente")),
-    );
-
-  } catch (e) {
-    print("ERROR REAL: $e");
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Error al actualizar perfil")),
-    );
-  }
-}
 
   @override
   Widget build(BuildContext context) {

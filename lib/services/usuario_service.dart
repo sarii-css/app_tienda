@@ -154,46 +154,29 @@ static String get baseUrl =>
     }
   }
 
-  static Future<Usuario> actualizarNombre(
-    int id,
-    String nuevoNombre,
-  ) async {
+static Future<void> actualizarNombre(int id, String nombre) async {
 
-    final url = Uri.parse("$baseUrl/$id");
+  final url = Uri.parse("$baseUrl/$id/nombre");
 
-    final response = await http.put(
+  print("==== ACTUALIZAR NOMBRE ====");
+  print("URL: $url");
+  print("BODY: ${jsonEncode({"nombreusuario": nombre})}");
 
-      url,
+  final response = await http.put(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "nombreusuario": nombre
+    }),
+  );
 
-      headers: {
-        "Content-Type": "application/json",
-      },
+  print("STATUS: ${response.statusCode}");
+  print("RESPONSE: ${response.body}");
 
-      body: jsonEncode({
-
-        "nombreusuario": nuevoNombre,
-      }),
-    );
-
-    print("================================");
-    print("ACTUALIZAR USUARIO");
-    print("STATUS: ${response.statusCode}");
-    print("BODY: ${response.body}");
-    print("================================");
-
-    if (response.statusCode == 200) {
-
-      final data = jsonDecode(response.body);
-
-      return Usuario.fromJson(data);
-
-    } else {
-
-      throw Exception(
-        "Error al actualizar usuario",
-      );
-    }
+  if (response.statusCode != 200) {
+    throw Exception("Error al actualizar usuario");
   }
+}
 
   static Future<void> actualizarCorreo(
     int id,
@@ -235,23 +218,4 @@ static String get baseUrl =>
 
     return response.statusCode == 200;
   }
-
-  static Future<void> actualizarUsuario(Usuario user) async {
-  final response = await http.put(
-    Uri.parse("$baseUrl/${user.idPK}"),
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode({
-      "nombreusuario": user.nombreusuario,
-      "correo": user.correo,
-      "contrasena": user.contrasena,
-    }),
-  );
-
-  print("USUARIO UPDATE STATUS: ${response.statusCode}");
-  print("BODY: ${response.body}");
-
-  if (response.statusCode != 200) {
-    throw Exception("Error al actualizar usuario");
-  }
-}
 }
