@@ -29,22 +29,28 @@ class DireccionService {
   }
 
   static Future<void> actualizarDireccion(Direccion direccion) async {
-    await http.put(
-      Uri.parse("$baseUrl/direccion/${direccion.idPk}"),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(direccion.toJson()),
-    );
-  }
+  print("JSON DIRECCION (UPDATE):");
+  print(jsonEncode(direccion.toJson())); 
+
+  await http.put(
+    Uri.parse("$baseUrl/direccion/${direccion.idPk}"),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode(direccion.toJson()),
+  );
+}
 
   static Future<void> crearDireccion(Direccion direccion) async {
-    await http.post(
-      Uri.parse("$baseUrl/direccion"),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(direccion.toJson()),
-    );
-  }
+  print("JSON DIRECCION (POST):");
+  print(jsonEncode(direccion.toJson())); 
+  
+  await http.post(
+    Uri.parse("$baseUrl/direccion"),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode(direccion.toJson()),
+  );
+}
 }

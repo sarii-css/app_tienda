@@ -100,7 +100,7 @@ class _PerfilPageState extends State<PerfilPage> {
         telefono: data.telefono,
         genero: data.genero,
         fechaNacimiento: data.fechaNacimiento,
-        direccion: direccion ?? Direccion.vacia(),
+        direccion: direccion ?? data.direccion,
         usuarioFK: data.usuarioFK,
       );
     });
@@ -139,45 +139,6 @@ class _PerfilPageState extends State<PerfilPage> {
       (route) => false,
     );
   }
-
-Future<void> guardarCambios() async {
-  if (usuario == null || cliente == null) return;
-
-  try {
-
-    await ClienteService.actualizarCliente(cliente!.idPk, { 
-      "nombre": nombreController.text,
-      "telefono": telefonoController.text,
-      "genero": generoController.text,
-      "fechaNacimiento": fechaController.text,
-      "direccion": {
-        "calle": calleController.text,
-        "numero": numeroController.text,
-        "colonia": coloniaController.text,
-        "cp": cpController.text,
-        "municipio": municipioController.text,
-        "estado": estadoController.text,
-        "pais": paisController.text,
-        "ciudad": ciudadController.text,
-      }
-    });
-
-    await UsuarioService.actualizarNombre(
-      usuario!.idPK, 
-      nombreController.text,
-);
-
-    print("Todo actualizado correctamente");
-
-    Navigator.pop(context);
-
-    await cargarUsuario();
-    await cargarCliente();
-
-  } catch (e) {
-    print("Error: $e");
-  }
-}
 
   void _mostrarPopupEdicion() {
     nombreController.text = cliente?.nombre ?? "";
@@ -237,6 +198,58 @@ Future<void> guardarCambios() async {
       },
     );
   }
+
+  Future<void> guardarCambios() async {
+  if (usuario == null || cliente == null) return;
+
+  try {
+    
+    await ClienteService.actualizarCliente(cliente!.idPk, { 
+      "idPk": cliente!.idPk, 
+      "nombre": nombreController.text,
+      "telefono": telefonoController.text,
+      "genero": generoController.text,
+      "fechaNacimiento": fechaController.text,
+      "direccion": {
+        "idPK": cliente!.direccion.idPk, 
+        }
+    });
+
+    final direccion = Direccion(
+      idPk: cliente!.direccion.idPk,
+      calle: calleController.text,
+      numero: numeroController.text,
+      colonia: coloniaController.text,
+      cp: cpController.text,
+      municipio: municipioController.text,
+      estado: estadoController.text,
+      pais: paisController.text,
+      ciudad: ciudadController.text,
+      idCliente: cliente!.idPk,
+    );
+
+    if (direccion.idPk == 0) {
+      await DireccionService.crearDireccion(direccion);
+    } else {
+      await DireccionService.actualizarDireccion(direccion);
+    }
+
+    await UsuarioService.actualizarNombre(
+      usuario!.idPK, 
+      nombreController.text,
+    );
+
+    print("Todo actualizado correctamente");
+
+    Navigator.pop(context);
+
+    await cargarUsuario();
+    await cargarCliente();
+
+  } catch (e) {
+    print("Error: $e");
+  }
+}
 
   @override
   Widget build(BuildContext context) {

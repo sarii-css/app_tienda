@@ -23,6 +23,9 @@ class ClienteService {
   }
 
   static Future<void> actualizarCliente(int id, Map<String, dynamic> cliente) async {
+      print("JSON ENVIADO:");
+      print(jsonEncode(cliente));
+
     final response = await http.put(
       Uri.parse("$baseUrl/cliente/$id"),
       headers: {"Content-Type": "application/json"},
